@@ -10,7 +10,6 @@ import data
 import training
 
 def get_settings(args):
-    # Settings with command-line overrides
     settings = {
         # General
         'train_new_model':              args.train_new_model,
@@ -72,12 +71,11 @@ def get_settings(args):
                 'min_scaled':   np.array([-1.0, -1.0]),
                 'max_scaled':   np.array([1.0, 1.0]),
             },
-            'dataset_name': 'Test_Signal',
-            'testset_name': 'Test_Signal',
+            'dataset_name': 'Test_Signal_Train',
+            'testset_name': 'Test_Signal_Test',
         }
     }
 
-    # Directories (using process and model_type from args)
     process = args.process
     model_type = args.model_type
     settings['models_dir'] = f"./models/{process}/"
@@ -95,12 +93,10 @@ def get_settings(args):
 
 def main():
     parser = argparse.ArgumentParser(description='Process model training settings.')
-    # General Settings
     parser.add_argument('--train_new_model', type=bool, default=True, help='Whether to train a new model')
     parser.add_argument('--process', type=str, default='CSTR1', choices=['CSTR1', 'ASU'], help='Process type')
     parser.add_argument('--model_type', type=str, default='Koopman', choices=['MLP', 'Koopman', 'Linear'], help='Type of model to train')
     parser.add_argument('--accuracy', type=str, default='float32', choices=['float32', 'float64'], help='Floating point precision')
-    # Training Settings
     parser.add_argument('--learning_rate', type=float, default=0.001, help='Learning rate for training')
     parser.add_argument('--max_epochs', type=int, default=5000, help='Maximum number of epochs')
     parser.add_argument('--batch_size', type=int, default=64, help='Batch size for training')
@@ -109,10 +105,8 @@ def main():
     parser.add_argument('--early_stopping_patience', type=int, default=200, help='Patience for early stopping')
     parser.add_argument('--train_val_ratio', type=float, default=0.8, help='Training to validation data ratio')
     parser.add_argument('--plot_test', type=bool, default=True, help='Whether to plot test results')
-    # Data Paths
     parser.add_argument('--train_data_path', type=str, required=True, help='Path to the training data')
     parser.add_argument('--test_data_path', type=str, required=True, help='Path to the testing data')
-    # Model Specific Settings
     parser.add_argument('--MLP_hidden_layer_sizes', type=str, default='10,10', help='Comma-separated list of MLP hidden layer sizes')
     parser.add_argument('--Koopman_latent_dim', type=int, default=8, help='Latent dimension size for Koopman model')
     parser.add_argument('--Koopman_encoder_n_hidden_layers', type=int, default=2, help='Number of hidden layers in Koopman encoder')
