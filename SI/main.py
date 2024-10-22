@@ -72,8 +72,8 @@ def get_settings(args):
                 'min_scaled':   np.array([-1.0, -1.0]),
                 'max_scaled':   np.array([1.0, 1.0]),
             },
-            'dataset_name': args.dataset_name,
-            'testset_name': args.testset_name,
+            'dataset_name': 'Test_Signal',
+            'testset_name': 'Test_Signal',
         }
     }
 
