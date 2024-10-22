@@ -35,7 +35,7 @@ def get_settings(args):
 
         # MLP model architecture
         'MLP': {
-            'hidden_layer_sizes':       args.MLP_hidden_layer_sizes,
+            'hidden_layer_sizes':       [int(x) for x in args.MLP_hidden_layer_sizes.split(',')],  # Expecting a comma-separated string
             'activation':               T.nn.Tanh,
             'output_activation':        T.nn.Identity,
         },
@@ -85,8 +85,8 @@ def get_settings(args):
     settings['logdir'] = f"./logs/{process}/{model_type}/"
     settings['data_dir'] = f"./data/{process}/"
     settings['plots_dir'] = f"./plots/{process}/{model_type}/"
-    settings['train_data_path'] = args.train_data_path  # Command-line specified train data path
-    settings['test_data_path'] = args.test_data_path    # Command-line specified test data path
+    settings['train_data_path'] = args.train_data_path
+    settings['test_data_path'] = args.test_data_path
 
     os.makedirs(settings['models_dir'], exist_ok=True)
     os.makedirs(settings['logdir'], exist_ok=True)
@@ -95,11 +95,12 @@ def get_settings(args):
 
 def main():
     parser = argparse.ArgumentParser(description='Process model training settings.')
-    # Existing arguments
+    # General Settings
     parser.add_argument('--train_new_model', type=bool, default=True, help='Whether to train a new model')
     parser.add_argument('--process', type=str, default='CSTR1', choices=['CSTR1', 'ASU'], help='Process type')
     parser.add_argument('--model_type', type=str, default='Koopman', choices=['MLP', 'Koopman', 'Linear'], help='Type of model to train')
     parser.add_argument('--accuracy', type=str, default='float32', choices=['float32', 'float64'], help='Floating point precision')
+    # Training Settings
     parser.add_argument('--learning_rate', type=float, default=0.001, help='Learning rate for training')
     parser.add_argument('--max_epochs', type=int, default=5000, help='Maximum number of epochs')
     parser.add_argument('--batch_size', type=int, default=64, help='Batch size for training')
@@ -108,9 +109,17 @@ def main():
     parser.add_argument('--early_stopping_patience', type=int, default=200, help='Patience for early stopping')
     parser.add_argument('--train_val_ratio', type=float, default=0.8, help='Training to validation data ratio')
     parser.add_argument('--plot_test', type=bool, default=True, help='Whether to plot test results')
-    # New arguments for data paths
+    # Data Paths
     parser.add_argument('--train_data_path', type=str, required=True, help='Path to the training data')
     parser.add_argument('--test_data_path', type=str, required=True, help='Path to the testing data')
+    # Model Specific Settings
+    parser.add_argument('--MLP_hidden_layer_sizes', type=str, default='10,10', help='Comma-separated list of MLP hidden layer sizes')
+    parser.add_argument('--Koopman_latent_dim', type=int, default=8, help='Latent dimension size for Koopman model')
+    parser.add_argument('--Koopman_encoder_n_hidden_layers', type=int, default=2, help='Number of hidden layers in Koopman encoder')
+    parser.add_argument('--Koopman_comb_loss', type=float, default=0.34, help='Weight for combined loss in Koopman training')
+    parser.add_argument('--Koopman_ae_loss', type=float, default=0.33, help='Weight for autoencoder loss in Koopman training')
+    parser.add_argument('--Koopman_pred_loss', type=float, default=0.33, help='Weight for prediction loss in Koopman training')
+
     args = parser.parse_args()
     settings = get_settings(args)
 
