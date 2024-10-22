@@ -54,7 +54,7 @@ def get_settings(args):
             'pred_loss':                args.Koopman_pred_loss,
         },
 
-        # Process
+        # Process-specific settings
         'CSTR1': {
             'n_states':      2,
             'n_controls':    2,
@@ -85,8 +85,8 @@ def get_settings(args):
     settings['logdir'] = f"./logs/{process}/{model_type}/"
     settings['data_dir'] = f"./data/{process}/"
     settings['plots_dir'] = f"./plots/{process}/{model_type}/"
-    settings['train_data_path'] = f"{settings['data_dir']}{settings['CSTR1']['dataset_name']}.pickle"
-    settings['test_data_path'] = f"{settings['data_dir']}{settings['CSTR1']['testset_name']}.pickle"
+    settings['train_data_path'] = args.train_data_path  # Command-line specified train data path
+    settings['test_data_path'] = args.test_data_path    # Command-line specified test data path
 
     os.makedirs(settings['models_dir'], exist_ok=True)
     os.makedirs(settings['logdir'], exist_ok=True)
@@ -95,7 +95,7 @@ def get_settings(args):
 
 def main():
     parser = argparse.ArgumentParser(description='Process model training settings.')
-    # Adding parser arguments corresponding to all settings
+    # Existing arguments
     parser.add_argument('--train_new_model', type=bool, default=True, help='Whether to train a new model')
     parser.add_argument('--process', type=str, default='CSTR1', choices=['CSTR1', 'ASU'], help='Process type')
     parser.add_argument('--model_type', type=str, default='Koopman', choices=['MLP', 'Koopman', 'Linear'], help='Type of model to train')
@@ -108,7 +108,9 @@ def main():
     parser.add_argument('--early_stopping_patience', type=int, default=200, help='Patience for early stopping')
     parser.add_argument('--train_val_ratio', type=float, default=0.8, help='Training to validation data ratio')
     parser.add_argument('--plot_test', type=bool, default=True, help='Whether to plot test results')
-    # Add more parameters as needed...
+    # New arguments for data paths
+    parser.add_argument('--train_data_path', type=str, required=True, help='Path to the training data')
+    parser.add_argument('--test_data_path', type=str, required=True, help='Path to the testing data')
     args = parser.parse_args()
     settings = get_settings(args)
 
