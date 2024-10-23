@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import torch.optim as optim
 import numpy as np
 import cvxpy as cp
 from cvxpylayers.torch import CvxpyLayer
@@ -11,22 +10,24 @@ import warnings
 sec_per_hour = 60 * 60 
 
 class MPC_Policy(nn.Module):
-    def __init__(self,settings):
+    def __init__(self, settings):
         super().__init__()
-        self.koopman_model = Koopman(settings)
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.koopman_model = Koopman(settings).to(self.device)
         self.load_CSTR1_koopman_model(path='/kaggle/working/best_val_model.pth')
         self.optlayer = get_CSTR1_optlayer(self.koopman_model.Az.weight)
-        self.max_action = torch.tensor([1.2 / sec_per_hour, 700.0 / sec_per_hour])
-        self.min_action = torch.tensor([0.8 / sec_per_hour, 0.0 / sec_per_hour])
-        self.max_state = torch.tensor([1.1 * 0.1367, 1.2 * 0.7293])
-        self.min_state = torch.tensor([0.9 * 0.1367, 0.8 * 0.7293])
+        self.max_action = torch.tensor([1.2 / sec_per_hour, 700.0 / sec_per_hour], device=self.device)
+        self.min_action = torch.tensor([0.8 / sec_per_hour, 0.0 / sec_per_hour], device=self.device)
+        self.max_state = torch.tensor([1.1 * 0.1367, 1.2 * 0.7293], device=self.device)
+        self.min_state = torch.tensor([0.9 * 0.1367, 0.8 * 0.7293], device=self.device)
 
     def load_CSTR1_koopman_model(self, path):
-        model_state_dict = torch.load(path, map_location=torch.device('cuda'))
+        model_state_dict = torch.load(path, map_location=self.device)
         self.koopman_model.load_state_dict(model_state_dict)
         print("Koopman model loaded successfully.")
 
     def forward(self, state):
+        state = state.to(self.device)  # Ensure the state is on the same device
         z_init = self.koopman_model.encoder(state)
         try:
             action = self.optlayer(self.koopman_model.Az.weight, self.koopman_model.Au.weight, self.koopman_model.decoder.weight, z_init)[0]
@@ -50,7 +51,7 @@ def get_CSTR1_optlayer(Az):
     nominal_production = 0.0
     num_timesteps = int(9 * 4)
     n_const_cntrl = int(4)
-    num_x, num_z, num_u = 2, Az.shape[0], 2
+    num_x, num_z, num_u = 2, Az.shape[0], 1
 
     Az_cp = cp.Parameter(shape=(num_z, num_z))
     Au_cp = cp.Parameter(shape=(num_z, num_u))
@@ -115,4 +116,4 @@ def test_single_state(settings):
     print(f"Predicted action (Fc) for state [Tr, Tj] = [45, 40]: {predicted_action.cpu().detach().numpy()}")
 
 if __name__ == "__main__":
-    test_single_state()
+    test_single_state(settings)
