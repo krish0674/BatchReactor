@@ -136,7 +136,7 @@ def main():
     # test_dataset = get_test_dataset(settings)
 
     print('data loading done done')
-
+    print(f"Trained model on {settings['device']} yay")
     # from data import get_train_val_dataloaders
     # train_dataloader, val_dataloader = data.get_train_val_dataloaders(settings)
     model = getattr(networks, settings['model_type'])(settings).to(settings['device'])
