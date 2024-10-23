@@ -11,6 +11,7 @@ import training
 
 from data import get_train_val_dataloaders 
 from data import get_test_dataset
+import torch 
 
 def get_settings(args):
     settings = {
@@ -144,9 +145,11 @@ def main():
         trainer = getattr(training, f"{settings['model_type']}Trainer")(
             model, train_dataloader, val_dataloader, settings)
         trainer.train()
-    # model.load_self(name_suffix='best_val')
-    # test_model.test_model(model, settings)
-    # print('Done!')
+        
+    model.load_state_dict(torch.load('/kaggle/working/best_val_model.pth', map_location=settings['device']))
+
+    test_model.test_model(model, settings)
+    print('Done!')
 
 if __name__ == "__main__":
     main()
