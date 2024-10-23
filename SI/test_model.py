@@ -71,8 +71,9 @@ def test_model_single(model, settings):
         X0 = X0.to(settings['device'])
         U0 = U0.to(settings['device'])
         X1 = X1.to(settings['device'])
-
+        print(X1)
         x1_pred = model(X0, U0)
+        print(x1_pred)
 
         val_loss = criterion(x1_pred, X1)
 
