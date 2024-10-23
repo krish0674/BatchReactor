@@ -88,7 +88,7 @@ def scale_data(dataset, settings):
             min_scaled, max_scaled)
 
         # scale data
-        # dataset = scaler.scale(dataset.values)
+        dataset = scaler.scale(dataset.values)
     else:
         raise ValueError(f"Process {settings['process']} not implemented.")
     return dataset
