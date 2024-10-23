@@ -124,6 +124,7 @@ def main():
     train_dataloader, val_dataloader = get_train_val_dataloaders(settings)
 
     for X0_batch, U0_batch, X1_batch in train_dataloader:
+        print('Train Example:\n')
         print(X0_batch.shape, U0_batch.shape, X1_batch.shape)
         print(X0_batch[3])
         print(X1_batch[3])
@@ -131,7 +132,11 @@ def main():
         break
 
     for X0_val, U0_val, X1_val in val_dataloader:
+        print('Val Example:\n')
         print(X0_val.shape, U0_val.shape, X1_val.shape)
+        print(X0_val[3])
+        print(X1_val[3])
+        print(U0_val[3])
         break
 
     # test_dataset = get_test_dataset(settings)
