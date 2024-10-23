@@ -54,29 +54,20 @@ def get_train_val_dataloaders(settings):
 def get_test_dataset(settings):
     dataset = load_raw_data(settings, train_or_test='test')
     dataset = scale_data(dataset, settings)
-    
-    # Convert dataset to a dictionary if needed (this part converts to lists)
-    if isinstance(dataset, pd.DataFrame):
-        dataset = dataset.to_dict(orient='list')
-    
-    # Convert each item in dataset to a tensor
     for k, v in dataset.items():
-        # Convert the list back to a tensor
-        dataset[k] = T.tensor(v, dtype=settings['accuracy'])
-
+        dataset[k] = T.tensor(v.values, dtype=settings['accuracy'])
+    
     if settings['process'] == 'CSTR1':
-        # Now stack the relevant tensors
-        X = T.stack([dataset['Tr'], dataset['Tj']], dim=1)  # Stack 'Tr' and 'Tj' into 2D tensor
-        U = dataset['Fc'].unsqueeze(1)  # Make 'Fc' 2D by adding an extra dimension
-
-        processed_dataset = {
-            'X': X,  # State variables
-            'U': U   # Control input
-        }
+        for k, v in dataset.items():
+            dataset[k] = {
+                'X': v[:,[1,2]],
+                'U': v[:,0],
+            }
     else:
         raise ValueError(f"Process {settings['process']} not implemented.")
+    
+    return dataset
 
-    return processed_dataset
 
 
 def load_raw_data(settings, train_or_test):
