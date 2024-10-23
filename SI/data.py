@@ -55,24 +55,27 @@ def get_test_dataset(settings):
     dataset = load_raw_data(settings, train_or_test='test')
     dataset = scale_data(dataset, settings)
     
-    # Convert each item in dataset to a tensor if it's not already
+    # Convert dataset to a DataFrame if needed
+    if isinstance(dataset, pd.DataFrame):
+        dataset = dataset.to_dict(orient='list')
+    
+    # Convert each item to tensor
     for k, v in dataset.items():
-        dataset[k] = T.tensor(v, dtype=settings['accuracy'])
-
+        # Ensure v is a NumPy array or convert to tensor directly
+        dataset[k] = T.tensor(np.array(v), dtype=settings['accuracy'])
+    # print(dataset)
+    dataset=pd.DataFrame(dataset)
     if settings['process'] == 'CSTR1':
-        # Combine the relevant variables into a 2D tensor
-        X = T.stack([dataset['Tr'], dataset['Tj']], dim=1)  # Stack 'Tr' and 'Tj' into 2D tensor
-        U = dataset['Fc'].unsqueeze(1)  # Make 'Fc' 2D by adding an extra dimension
-
-        processed_dataset = {
-            'X': X,  # State variables
-            'U': U   # Control input
-        }
+        for k, v in dataset.items():
+            v = v.numpy()  # Convert tensor back to NumPy if necessary
+            dataset[k] = {
+                'X': v[:, [1, 2]],  # Tr and Tj are state (columns 1 and 2)
+                'U': v[:, 0:1],     # only Fc (column 0)
+            }
     else:
         raise ValueError(f"Process {settings['process']} not implemented.")
 
-    return processed_dataset
-
+    return dataset
 
 
 def load_raw_data(settings, train_or_test):
