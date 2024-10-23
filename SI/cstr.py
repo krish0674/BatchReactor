@@ -6,14 +6,12 @@ import cvxpy as cp
 from cvxpylayers.torch import CvxpyLayer
 from timeit import default_timer as timer
 from networks import Koopman
-from main import get_settings
 import warnings
 
 sec_per_hour = 60 * 60 
-settings = get_settings()
 
 class MPC_Policy(nn.Module):
-    def __init__(self):
+    def __init__(self,settings):
         super().__init__()
         self.koopman_model = Koopman(settings)
         self.load_CSTR1_koopman_model(path='/kaggle/working/best_val_model.pth')
@@ -108,8 +106,8 @@ def get_CSTR1_optlayer(Az):
     print('\nTime taken to set up economic OptLayer for MPC Policy: ' + str(time) + ' seconds\n')
     return optlayer
 
-def test_single_state():
-    policy = MPC_Policy()
+def test_single_state(settings):
+    policy = MPC_Policy(settings)
     test_state = torch.tensor([45.0, 40.0])
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     test_state = test_state.to(device)
