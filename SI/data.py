@@ -44,11 +44,10 @@ def get_train_val_dataloaders(settings):
     train_dataloader = DataLoader(
         dataset=train_dataset,
         batch_size=settings['batch_size'],
-        shuffle=False, drop_last=True)
+        shuffle=True, drop_last=True)
     val_dataloader = DataLoader(
         dataset=val_dataset,
-        batch_size=len(val_dataset),
-        shuffle=False)
+        batch_size=len(val_dataset))
 
     return train_dataloader, val_dataloader
 
@@ -84,10 +83,8 @@ def get_test_dataloader1(settings):
         T.tensor(X1_test, dtype=settings['accuracy']))
     test_dataloader = DataLoader(
         dataset=dataset,
-        batch_size=len(dataset),
-        shuffle=False)
+        batch_size=len(dataset))
     return test_dataloader
-
 
 def load_raw_data(settings, train_or_test):
     dataset = pd.read_csv(settings[f'{train_or_test}_data_path'])
