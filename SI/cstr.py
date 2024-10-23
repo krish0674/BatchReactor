@@ -78,8 +78,8 @@ I0 = 4.5e-3
 
 # Initialize the Koopman Model (this assumes you've already loaded your Koopman model)
 class KoopmanModel:
-    def __init__(self, model_path,settings):
-        self.model = self.load_koopman_model(model_path)
+    def __init__(self,settings):
+        self.model = self.load_koopman_model('/kaggle/working/best_val_model.pth')
         self.settings=settings
     def load_koopman_model(self, path):
         model_state_dict = torch.load(path, map_location='cpu')
@@ -96,7 +96,7 @@ class KoopmanModel:
 
 # Instantiate the Koopman model
 def testit(settings):
-    koopman_model = KoopmanModel('/kaggle/working/best_val_model.pth',settings)
+    koopman_model = KoopmanModel(settings)
 
     # Initial conditions (current state and control input)
     Tr_initial = 45.0
