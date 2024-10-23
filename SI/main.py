@@ -145,10 +145,10 @@ def main():
         trainer = getattr(training, f"{settings['model_type']}Trainer")(
             model, train_dataloader, val_dataloader, settings)
         trainer.train()
-        
+
     model.load_state_dict(torch.load('/kaggle/working/best_val_model.pth', map_location=settings['device']))
 
-    test_model.test_model(model, settings)
+    test_model.test_model_single(model, settings)
     print('Done!')
 
 if __name__ == "__main__":
