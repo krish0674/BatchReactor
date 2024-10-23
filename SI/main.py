@@ -133,7 +133,7 @@ def main():
         print(X0_val.shape, U0_val.shape, X1_val.shape)
         break
 
-    test_dataset = get_test_dataset(settings)
+    # test_dataset = get_test_dataset(settings)
 
     print('data loading done done')
 
