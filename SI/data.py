@@ -63,7 +63,7 @@ def get_test_dataset(settings):
     for k, v in dataset.items():
         # Ensure v is a NumPy array or convert to tensor directly
         dataset[k] = T.tensor(np.array(v), dtype=settings['accuracy'])
-
+    print(dataset)
     if settings['process'] == 'CSTR1':
         for k, v in dataset.items():
             v = v.numpy()  # Convert tensor back to NumPy if necessary
