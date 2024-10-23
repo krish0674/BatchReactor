@@ -2,6 +2,7 @@
 import torch as T
 import numpy as np
 from torch.utils.tensorboard import SummaryWriter
+import torch
 
 class Trainer():
     def __init__(self,model, train_dataloader, val_dataloader, settings):
@@ -69,7 +70,8 @@ class Trainer():
         if val_loss < self.best_val_loss:
             self.best_val_loss = val_loss
             self.best_val_epoch = self.epoch
-            self.model.save_self(name_suffix='best_val')
+            # self.model.save_self(name_suffix='best_val')
+            torch.save(self.model.state_dict(), './kaggle/working/best_val_model.pth')
         return None
 
     def print_epoch_info(self):
