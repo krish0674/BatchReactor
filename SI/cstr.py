@@ -79,23 +79,24 @@ I0 = 4.5e-3
 
 # Initialize the Koopman Model (this assumes you've already loaded your Koopman model)
 class KoopmanModel:
-    def __init__(self,settings):
+    def __init__(self, settings):
+        self.settings = settings  # Ensure settings are passed and stored correctly
         self.model = self.load_koopman_model('/kaggle/working/best_val_model.pth')
-        self.settings=settings
+
     def load_koopman_model(self, path):
-        model_state_dict = torch.load(path, map_location='cpu')
+        model_state_dict = torch.load(path, map_location=self.settings['device'])  # Use the correct device
         model = getattr(networks, self.settings['model_type'])(self.settings).to(self.settings['device'])
         model.load_state_dict(model_state_dict)
         model.eval()
         return model
 
     def predict_next_state(self, current_state, control_input):
-        current_state_tensor = torch.tensor(current_state, dtype=torch.float32)
-        control_input_tensor = torch.tensor(control_input, dtype=torch.float32)
+        current_state_tensor = torch.tensor(current_state, dtype=torch.float32).to(self.settings['device'])
+        control_input_tensor = torch.tensor(control_input, dtype=torch.float32).to(self.settings['device'])
         next_state = self.model(current_state_tensor, control_input_tensor)
-        return next_state.detach().numpy()
+        return next_state.detach().cpu().numpy()  # Detach from GPU and move to CPU for further processing
 
-# Instantiate the Koopman model
+# Instantiate the Koopman model and run the simulation
 def testit(settings):
     koopman_model = KoopmanModel(settings)
 
@@ -138,3 +139,4 @@ def testit(settings):
         current_Fc = new_Fc
 
         print(f"Iteration {i+1}: Tr = {Tr_next:.2f}, Tj = {Tj_next:.2f}, Fc = {current_Fc:.2f}, dTr = {dTr:.2f}, dTj = {dTj:.2f}")
+
