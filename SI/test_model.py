@@ -32,6 +32,10 @@ def test_model(model, settings):
     # Ensure X_pred is on the same device as X
     X_pred = X_pred.to(device)
 
+    print("Model predictions (X_pred):", X_pred)
+    print("Target values (X):", X)
+
+
     # Calculate MSE for each state variable and total MSE
     for i, name in enumerate(settings[settings['process']]['state_names']):
         MSEs[name].append(loss_function(X_pred[:, i], X[:, i]).item())
