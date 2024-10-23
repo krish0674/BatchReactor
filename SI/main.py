@@ -124,9 +124,9 @@ def main():
 
     for X0_batch, U0_batch, X1_batch in train_dataloader:
         print(X0_batch.shape, U0_batch.shape, X1_batch.shape)
-        print(X0_batch[0])
-        print(X1_batch[0])
-        print(U0_batch[0])
+        print(X0_batch[3])
+        print(X1_batch[3])
+        print(U0_batch[3])
         break
 
     for X0_val, U0_val, X1_val in val_dataloader:
