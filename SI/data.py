@@ -57,15 +57,15 @@ def get_test_dataset(settings):
     for k, v in dataset.items():
         dataset[k] = T.tensor(v.values, dtype=settings['accuracy'])
     
-    # if settings['process'] == 'CSTR1':
-    #     print(dataset)
-    #     for k, v in dataset.items():
-    #         dataset[k] = {
-    #             'X': v[:,[1,2]],
-    #             'U': v[:,0],
-    #         }
-    # else:
-    #     raise ValueError(f"Process {settings['process']} not implemented.")
+    if settings['process'] == 'CSTR1':
+        print(dataset)
+        for k, v in dataset.items():
+            dataset[k] = {
+                'X': v[:,[2,3]],
+                'U': v[:,0],
+            }
+    else:
+        raise ValueError(f"Process {settings['process']} not implemented.")
     
     return dataset
 
