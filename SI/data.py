@@ -113,8 +113,8 @@ def scale_data(dataset, settings):
 
 def train_val_split(dataset, settings, random_split=True):
     indices = list(range(len(dataset)))
-    # if random_split:
-    #     np.random.shuffle(indices)
+    if random_split:
+        np.random.shuffle(indices)
     split_index = int(np.floor(settings['train_val_ratio'] * len(dataset)))
     train_indices, val_indices = indices[:split_index], indices[split_index:]
 
