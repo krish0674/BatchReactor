@@ -9,6 +9,7 @@ import data
 
 def test_model(model, settings):
     dataset = data.get_test_dataset(settings)
+    print(dataset)
     loss_function = settings['loss_function']()
 
     MSEs = {k: [] for k in settings[settings['process']]['state_names']}
