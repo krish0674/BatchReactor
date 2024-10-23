@@ -16,8 +16,8 @@ class MPC_Policy(nn.Module):
         self.koopman_model = Koopman(settings).to(self.device)
         self.load_CSTR1_koopman_model(path='/kaggle/working/best_val_model.pth')
         self.optlayer = get_CSTR1_optlayer(self.koopman_model.Az.weight)
-        self.max_action = torch.tensor([1.2 / sec_per_hour, 700.0 / sec_per_hour], device=self.device)
-        self.min_action = torch.tensor([0.8 / sec_per_hour, 0.0 / sec_per_hour], device=self.device)
+        self.max_action = torch.tensor([1.2 / sec_per_hour], device=self.device)  # Single control input
+        self.min_action = torch.tensor([0.8 / sec_per_hour], device=self.device)
         self.max_state = torch.tensor([1.1 * 0.1367, 1.2 * 0.7293], device=self.device)
         self.min_state = torch.tensor([0.9 * 0.1367, 0.8 * 0.7293], device=self.device)
 
@@ -51,7 +51,7 @@ def get_CSTR1_optlayer(Az):
     nominal_production = 0.0
     num_timesteps = int(9 * 4)
     n_const_cntrl = int(4)
-    num_x, num_z, num_u = 2, Az.shape[0], 1
+    num_x, num_z, num_u = 2, Az.shape[0], 1  # Only one control input now
 
     Az_cp = cp.Parameter(shape=(num_z, num_z))
     Au_cp = cp.Parameter(shape=(num_z, num_u))
@@ -65,7 +65,8 @@ def get_CSTR1_optlayer(Az):
     for t in range(num_timesteps):
         Z[t] = cp.Variable(shape=num_z)
     for t in range(num_timesteps-1):
-        U[t] = cp.Variable(shape=num_u)
+        U[t] = cp.Variable(shape=num_u)  # Only one control input (1D)
+
     for t in range(num_timesteps):
         X_slack[t] = cp.Variable(shape=num_x, nonneg=True)
 
@@ -78,8 +79,8 @@ def get_CSTR1_optlayer(Az):
         constraints.append(ZtoX_cp @ Z[t] - X_slack[t] <= np.array([1., 1.]))
 
     for t in range(num_timesteps-1):
-        constraints.append(U[t] >= np.array([-1., -1.]))
-        constraints.append(U[t] <= np.array([1., 1.]))
+        constraints.append(U[t] >= np.array([-1.]))
+        constraints.append(U[t] <= np.array([1.]))
 
     for t in range(1, num_timesteps-1):
         if t % n_const_cntrl != 0:
@@ -88,7 +89,7 @@ def get_CSTR1_optlayer(Az):
     for t in range(1, num_timesteps):
         constraints.append(Az_cp @ Z[t-1] + Au_cp @ U[t-1] == Z[t])
 
-    objective = sum(U[t][1] for t in range(num_timesteps-1))
+    objective = sum(U[t] for t in range(num_timesteps-1))  # Adjusted for 1D U
     objective += sum(X_slack[t] ** 2 @ M_slack for t in range(num_timesteps))
 
     objective = cp.Minimize(objective)
@@ -115,5 +116,5 @@ def test_single_state(settings):
     predicted_action = policy(test_state)
     print(f"Predicted action (Fc) for state [Tr, Tj] = [45, 40]: {predicted_action.cpu().detach().numpy()}")
 
-if __name__ == "__main__":
-    test_single_state(settings)
+# if __name__ == "__main__":
+#     test_single_state(settings)
