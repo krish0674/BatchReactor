@@ -100,8 +100,9 @@ def train_val_split(dataset, settings, random_split=True):
     split_index = int(np.floor(settings['train_val_ratio'] * len(dataset)))
     train_indices, val_indices = indices[:split_index], indices[split_index:]
 
-    train_dataset = dataset.iloc[train_indices]
-    val_dataset = dataset.iloc[val_indices]
+    # Use array indexing instead of iloc for NumPy arrays
+    train_dataset = dataset[train_indices]
+    val_dataset = dataset[val_indices]
     return train_dataset, val_dataset
 
 def get_X0_U0_X1(dataset, settings):
