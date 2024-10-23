@@ -106,7 +106,7 @@ def main():
     parser.add_argument('--batch_size', type=int, default=64, help='Batch size for training')
     parser.add_argument('--validate_every_n_epochs', type=int, default=1, help='Frequency of validation per number of epochs')
     parser.add_argument('--print_every_n_epochs', type=int, default=10, help='Frequency of printing progress per number of epochs')
-    parser.add_argument('--early_stopping_patience', type=int, default=200, help='Patience for early stopping')
+    parser.add_argument('--early_stopping_patience', type=int, default=500, help='Patience for early stopping')
     parser.add_argument('--train_val_ratio', type=float, default=0.8, help='Training to validation data ratio')
     parser.add_argument('--plot_test', type=bool, default=True, help='Whether to plot test results')
     parser.add_argument('--train_data_path', type=str,default='/kaggle/input/si-data/Test_Signal_Data.csv', required=True, help='Path to the training data')
