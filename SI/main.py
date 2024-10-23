@@ -137,8 +137,8 @@ def main():
 
     print('data loading done done')
 
-    from data import get_train_val_dataloaders
-    train_dataloader, val_dataloader = data.get_train_val_dataloaders(settings)
+    # from data import get_train_val_dataloaders
+    # train_dataloader, val_dataloader = data.get_train_val_dataloaders(settings)
     model = getattr(networks, settings['model_type'])(settings).to(settings['device'])
     if settings['train_new_model']:
         trainer = getattr(training, f"{settings['model_type']}Trainer")(
