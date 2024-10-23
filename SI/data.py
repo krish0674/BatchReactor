@@ -55,12 +55,17 @@ def get_test_dataset(settings):
     dataset = load_raw_data(settings, train_or_test='test')
     dataset = scale_data(dataset, settings)
     
-    # Convert each item in dataset to a tensor if it's not already
+    # Convert dataset to a dictionary if needed (this part converts to lists)
+    if isinstance(dataset, pd.DataFrame):
+        dataset = dataset.to_dict(orient='list')
+    
+    # Convert each item in dataset to a tensor
     for k, v in dataset.items():
+        # Convert the list back to a tensor
         dataset[k] = T.tensor(v, dtype=settings['accuracy'])
 
     if settings['process'] == 'CSTR1':
-        # Combine the relevant variables into a 2D tensor
+        # Now stack the relevant tensors
         X = T.stack([dataset['Tr'], dataset['Tj']], dim=1)  # Stack 'Tr' and 'Tj' into 2D tensor
         U = dataset['Fc'].unsqueeze(1)  # Make 'Fc' 2D by adding an extra dimension
 
@@ -72,7 +77,6 @@ def get_test_dataset(settings):
         raise ValueError(f"Process {settings['process']} not implemented.")
 
     return processed_dataset
-
 
 
 def load_raw_data(settings, train_or_test):
