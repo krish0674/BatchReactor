@@ -1,20 +1,15 @@
-# 3rd party imports
 import torch as T
 from torch.utils.data import DataLoader, TensorDataset
 import numpy as np
-import pickle
 import pandas as pd
 
 class ElementwiseScaler():
     # scales and unscales a vector elementwise
     # min and max should be np.arrays of the same shape as the vector x
-    def __init__(self,
-                 min_unscaled, max_unscaled,
-                 min_scaled, max_scaled):
+    def __init__(self, min_unscaled, max_unscaled, min_scaled, max_scaled):
         self.min_unscaled = min_unscaled
         self.max_unscaled = max_unscaled
         self.range_unscaled = max_unscaled - min_unscaled
-
         self.min_scaled = min_scaled
         self.max_scaled = max_scaled
         self.range_scaled = max_scaled - min_scaled
@@ -65,8 +60,8 @@ def get_test_dataset(settings):
     if settings['process'] == 'CSTR1':
         for k, v in dataset.items():
             dataset[k] = {
-                'X': v[:,:2],
-                'U': v[:,2:],
+                'X': v[:,[1, 2]],  # Tr and Tj is state(columsn 1 and 2
+                'U': v[:,0:1],     #only Fc
             }
     else:
         raise ValueError(f"Process {settings['process']} not implemented.")
@@ -74,21 +69,12 @@ def get_test_dataset(settings):
     return dataset
 
 def load_raw_data(settings, train_or_test):
-    if settings['process'] == 'CSTR1':
-        with open(settings[f"{train_or_test}_data_path"], 'rb') as handle:
-            dataset = pickle.load(handle)
-        columns = ['c','T','roh','Fc'] # order of columns in dataset
-        for k, v in dataset.items():
-            dataset[k] = v[columns]
-
-    else:
-        raise ValueError(f"Process {settings['process']} not implemented.")
-
+    dataset = pd.read_csv(settings[f'{train_or_test}_data_path'])
     return dataset
 
 def scale_data(dataset, settings):
     if settings['process'] == 'CSTR1':
-        # get scaler
+        # Adjust the scaler initialization as needed
         min_unscaled = np.concatenate((
             settings['CSTR1']['state_scaling']['min_unscaled'],
             settings['CSTR1']['action_scaling']['min_unscaled']))
@@ -102,9 +88,7 @@ def scale_data(dataset, settings):
             min_scaled, max_scaled)
 
         # scale data
-        for k,v in dataset.items():
-            dataset[k] = scaler.scale(v)
-
+        dataset = scaler.scale(dataset.values)
     else:
         raise ValueError(f"Process {settings['process']} not implemented.")
     return dataset
@@ -116,27 +100,16 @@ def train_val_split(dataset, settings, random_split=True):
     split_index = int(np.floor(settings['train_val_ratio'] * len(dataset)))
     train_indices, val_indices = indices[:split_index], indices[split_index:]
 
-    train_dataset = [dataset[i].values for i in train_indices]
-    val_dataset = [dataset[i].values for i in val_indices]
+    train_dataset = dataset.iloc[train_indices]
+    val_dataset = dataset.iloc[val_indices]
     return train_dataset, val_dataset
 
 def get_X0_U0_X1(dataset, settings):
-    X0_U0 = []
-    X1 = []
+    # This function needs the major adjustment for column indexes
+    X0 = dataset.iloc[:-1, [2, 3]].values  # 'Tr' and 'Tj'
+    U0 = dataset.iloc[:-1, [1]].values  # 'Fc'
+    X1 = dataset.iloc[1:, [2, 3]].values  # 'Tr' and 'Tj' next time step
 
-    for i_timeseries in range(len(dataset)):
-        timeseries = dataset[i_timeseries]
-        X0_U0.append(timeseries[:-1,:])
-        X1.append(timeseries[1:,:2])
-
-    X0_U0 = np.concatenate(X0_U0, axis=0)
-    X1 = np.concatenate(X1, axis=0)
-
-    if settings['process'] == 'CSTR1':
-        X0 = X0_U0[:,:2]
-        U0 = X0_U0[:,2:]
-    else:
-        raise ValueError(f"Process {settings['process']} not implemented.")
     return X0, U0, X1
 
 if __name__ == '__main__':
@@ -147,6 +120,9 @@ if __name__ == '__main__':
 
     for X0_batch, U0_batch, X1_batch in train_dataloader:
         print(X0_batch.shape, U0_batch.shape, X1_batch.shape)
+        print(X0_batch[0])
+        print(X1_batch[0])
+        print(U0_batch[0])
         break
 
     for X0_val, U0_val, X1_val in val_dataloader:
@@ -155,4 +131,4 @@ if __name__ == '__main__':
 
     test_dataset = get_test_dataset(settings)
 
-    print('done')
+    print('data loading done done')
