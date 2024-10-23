@@ -91,10 +91,10 @@ class KoopmanModel:
         return model
 
     def predict_next_state(self, current_state, control_input):
-        current_state_tensor = torch.tensor(current_state, dtype=torch.float32).to(self.settings['device'])
-        control_input_tensor = torch.tensor(control_input, dtype=torch.float32).to(self.settings['device'])
+        current_state_tensor = torch.tensor(current_state, dtype=torch.float32).unsqueeze(0).to(self.settings['device'])  # Add batch dimension
+        control_input_tensor = torch.tensor(control_input, dtype=torch.float32).unsqueeze(0).to(self.settings['device'])  # Add batch dimension
         next_state = self.model(current_state_tensor, control_input_tensor)
-        return next_state.detach().cpu().numpy()  # Detach from GPU and move to CPU for further processing
+        return next_state.squeeze(0).detach().cpu().numpy()  # Remove batch dimension before returning
 
 # Instantiate the Koopman model and run the simulation
 def testit(settings):
