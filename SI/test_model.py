@@ -15,9 +15,13 @@ def test_model(model, settings):
 
     # loop through test datasets
     for i_tds, tds in dataset.items():
-        X = tds['X']
-        U = tds['U']
+        X = dataset[:,[2,3]]
+        U = dataset[:,0]
 
+        device = settings['device']
+        X = T.tensor(X, dtype=settings['accuracy']).to(device)
+        U = T.tensor(U, dtype=settings['accuracy']).to(device)
+        
         # X_pred = predict_timeseries_closed_loop(model, X, U)
         X_pred = model.multi_step_prediction(X[0, :], U[:-1,:])
 
