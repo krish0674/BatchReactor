@@ -10,7 +10,7 @@ import data
 import training
 
 from data import get_train_val_dataloaders 
-from data import get_test_dataset
+from data import get_test_dataset,get_test_dataloader1
 import torch 
 
 def get_settings(args):
