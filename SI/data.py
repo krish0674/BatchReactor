@@ -44,7 +44,7 @@ def get_train_val_dataloaders(settings):
     train_dataloader = DataLoader(
         dataset=train_dataset,
         batch_size=settings['batch_size'],
-        shuffle=True, drop_last=True)
+        shuffle=False, drop_last=True)
     val_dataloader = DataLoader(
         dataset=val_dataset,
         batch_size=len(val_dataset))
