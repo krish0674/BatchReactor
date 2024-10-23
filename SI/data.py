@@ -47,7 +47,8 @@ def get_train_val_dataloaders(settings):
         shuffle=False, drop_last=True)
     val_dataloader = DataLoader(
         dataset=val_dataset,
-        batch_size=len(val_dataset))
+        batch_size=len(val_dataset),
+        shuffle=False)
 
     return train_dataloader, val_dataloader
 
@@ -73,6 +74,19 @@ def get_test_dataset(settings):
     
     return processed_dataset
 
+def get_test_dataloader1(settings):
+    dataset = load_raw_data(settings, train_or_test='train')
+    dataset = scale_data(dataset, settings)
+    X0_test, U0_test, X1_test = get_X0_U0_X1(dataset, settings)
+    dataset = TensorDataset(
+        T.tensor(X0_test, dtype=settings['accuracy']),
+        T.tensor(U0_test, dtype=settings['accuracy']),
+        T.tensor(X1_test, dtype=settings['accuracy']))
+    test_dataloader = DataLoader(
+        dataset=dataset,
+        batch_size=len(dataset),
+        shuffle=False)
+    return test_dataloader
 
 
 def load_raw_data(settings, train_or_test):

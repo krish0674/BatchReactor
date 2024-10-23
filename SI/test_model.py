@@ -55,6 +55,36 @@ def test_model(model, settings):
 
     return None
 
+import torch
+from torch.nn import MSELoss
+
+def test_model_single(model, settings):
+    dataset = data.get_test_dataset1(settings)
+    criterion = MSELoss()
+    model.eval()
+
+    total_loss = 0.0
+    num_batches = 0
+
+    for row in dataset:
+        X0, U0, X1 = row  
+        X0 = X0.to(settings['device'])
+        U0 = U0.to(settings['device'])
+        X1 = X1.to(settings['device'])
+
+        x1_pred = model(X0, U0)
+
+        val_loss = criterion(x1_pred, X1)
+
+        total_loss += val_loss.item()
+        num_batches += 1
+
+    avg_loss = total_loss / num_batches if num_batches > 0 else 0.0
+
+    print(f'Validation Loss: {avg_loss:.4f}')
+
+    return avg_loss
+
 
 
 def predict_timeseries_closed_loop(model, X, U):
