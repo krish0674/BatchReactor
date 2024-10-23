@@ -6,16 +6,16 @@ import cvxpy as cp
 from cvxpylayers.torch import CvxpyLayer
 from timeit import default_timer as timer
 from networks import Koopman
-# from main import get_settings
+from main import get_settings
 import warnings
 
 sec_per_hour = 60 * 60 
-# settings = get_settings()
+settings = get_settings()
 
 class MPC_Policy(nn.Module):
     def __init__(self):
         super().__init__()
-        self.koopman_model = Koopman()
+        self.koopman_model = Koopman(settings)
         self.load_CSTR1_koopman_model(path='/kaggle/working/best_val_model.pth')
         self.optlayer = get_CSTR1_optlayer(self.koopman_model.Az.weight)
         self.max_action = torch.tensor([1.2 / sec_per_hour, 700.0 / sec_per_hour])
