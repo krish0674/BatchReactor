@@ -117,6 +117,24 @@ def main():
     args = parser.parse_args()
     settings = get_settings(args)
 
+    from data import get_test_dataset
+    train_dataloader, val_dataloader = get_train_val_dataloaders(settings)
+
+    for X0_batch, U0_batch, X1_batch in train_dataloader:
+        print(X0_batch.shape, U0_batch.shape, X1_batch.shape)
+        print(X0_batch[0])
+        print(X1_batch[0])
+        print(U0_batch[0])
+        break
+
+    for X0_val, U0_val, X1_val in val_dataloader:
+        print(X0_val.shape, U0_val.shape, X1_val.shape)
+        break
+
+    test_dataset = get_test_dataset(settings)
+
+    print('data loading done done')
+    
     train_dataloader, val_dataloader = data.get_train_val_dataloaders(settings)
     model = getattr(networks, settings['model_type'])(settings).to(settings['device'])
     if settings['train_new_model']:
