@@ -9,6 +9,9 @@ import test_model
 import data
 import training
 
+from data import get_train_val_dataloaders 
+from data import get_test_dataset
+
 def get_settings(args):
     settings = {
         # General
@@ -117,7 +120,6 @@ def main():
     args = parser.parse_args()
     settings = get_settings(args)
 
-    from data import get_test_dataset
     train_dataloader, val_dataloader = get_train_val_dataloaders(settings)
 
     for X0_batch, U0_batch, X1_batch in train_dataloader:
