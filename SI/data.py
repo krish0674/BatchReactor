@@ -54,19 +54,28 @@ def get_train_val_dataloaders(settings):
 def get_test_dataset(settings):
     dataset = load_raw_data(settings, train_or_test='test')
     dataset = scale_data(dataset, settings)
-    for k, v in dataset.items():
-        dataset[k] = T.tensor(v.values, dtype=settings['accuracy'])
     
+    # Convert dataset to a DataFrame if needed
+    if isinstance(dataset, pd.DataFrame):
+        dataset = dataset.to_dict(orient='list')
+    
+    # Convert each item to tensor
+    for k, v in dataset.items():
+        # Ensure v is a NumPy array or convert to tensor directly
+        dataset[k] = T.tensor(np.array(v), dtype=settings['accuracy'])
+
     if settings['process'] == 'CSTR1':
         for k, v in dataset.items():
+            v = v.numpy()  # Convert tensor back to NumPy if necessary
             dataset[k] = {
-                'X': v[:,[1, 2]],  # Tr and Tj is state(columsn 1 and 2
-                'U': v[:,0:1],     #only Fc
+                'X': v[:, [1, 2]],  # Tr and Tj are state (columns 1 and 2)
+                'U': v[:, 0:1],     # only Fc (column 0)
             }
     else:
         raise ValueError(f"Process {settings['process']} not implemented.")
-    
+
     return dataset
+
 
 def load_raw_data(settings, train_or_test):
     dataset = pd.read_csv(settings[f'{train_or_test}_data_path'])

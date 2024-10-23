@@ -144,9 +144,9 @@ def main():
         trainer = getattr(training, f"{settings['model_type']}Trainer")(
             model, train_dataloader, val_dataloader, settings)
         trainer.train()
-    # model.load_self(name_suffix='best_val')
-    # test_model.test_model(model, settings)
-    # print('Done!')
+    model.load_self(name_suffix='best_val')
+    test_model.test_model(model, settings)
+    print('Done!')
 
 if __name__ == "__main__":
     main()
