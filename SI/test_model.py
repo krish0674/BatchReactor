@@ -59,7 +59,7 @@ import torch
 from torch.nn import MSELoss
 
 def test_model_single(model, settings):
-    dataset = data.get_test_dataset1(settings)
+    dataset = data.get_test_dataloader1(settings)
     criterion = MSELoss()
     model.eval()
 
