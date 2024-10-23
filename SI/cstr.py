@@ -1,120 +1,139 @@
 import torch
-import torch.nn as nn
 import numpy as np
-import cvxpy as cp
-from cvxpylayers.torch import CvxpyLayer
-from timeit import default_timer as timer
 from networks import Koopman
-import warnings
 
-sec_per_hour = 60 * 60 
+# Define dynamic system equations (based on the image provided)
+def br(x, u, Ad, Ed, Ap, Ep, deltaHp, UA, Qc, Qs, V, Tc, Cpc, R, alpha, beta, epsilon, theta, m1, cp1, mjCpj, cp2, cp3, cp4, m5, cp5, m6, cp6, M0, I0, Tamb):
+    F = u * 16.667  # convert control input Fc to flow rate
+    Ii = x[0]
+    M = x[1]
+    Tr = x[2]
+    Tj = x[3]
 
-class MPC_Policy(nn.Module):
-    def __init__(self, settings):
-        super().__init__()
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.koopman_model = Koopman(settings).to(self.device)
-        self.load_CSTR1_koopman_model(path='/kaggle/working/best_val_model.pth')
-        self.optlayer = get_CSTR1_optlayer(self.koopman_model.Az.weight)
-        self.max_action = torch.tensor([1.2 / sec_per_hour], device=self.device)  # Single control input
-        self.min_action = torch.tensor([0.8 / sec_per_hour], device=self.device)
-        self.max_state = torch.tensor([1.1 * 0.1367, 1.2 * 0.7293], device=self.device)
-        self.min_state = torch.tensor([0.9 * 0.1367, 0.8 * 0.7293], device=self.device)
+    # Reaction rates
+    Ri = Ad * Ii * (np.exp(-Ed / (R * (Tr + 273.15))))
+    Rp = Ap * (Ii ** epsilon) * (M ** theta) * (np.exp(-Ep / (R * (Tr + 273.15))))
 
-    def load_CSTR1_koopman_model(self, path):
-        model_state_dict = torch.load(path, map_location=self.device)
-        self.koopman_model.load_state_dict(model_state_dict)
-        print("Koopman model loaded successfully.")
+    # Heat capacities and heat loss terms
+    mrCpr = m1 * cp1 + Ii * cp2 * V + M * cp3 * V + (M0 - M) * cp4 * V + m5 * cp5 + m6 * cp6
+    Qpr = alpha * (Tr - Tc) ** beta
+    Qr = Rp * V * (-deltaHp)
+    Qloss = alpha * (Tr - Tamb) ** beta
 
-    def forward(self, state):
-        state = state.to(self.device)  # Ensure the state is on the same device
-        z_init = self.koopman_model.encoder(state)
-        try:
-            action = self.optlayer(self.koopman_model.Az.weight, self.koopman_model.Au.weight, self.koopman_model.decoder.weight, z_init)[0]
-        except:
-            warnings.warn("Fallback to SCS solver in optlayer due to error.")
-            action = self.optlayer(self.koopman_model.Az.weight, self.koopman_model.Au.weight, self.koopman_model.decoder.weight, z_init, solver_args={'solve_method':'SCS'})[0]
-        return action
+    # Dynamic equations
+    dy1_dt = -Ri
+    dy2_dt = -Rp
+    dy3_dt = (Qr - UA * (Tr - Tj) + Qc + Qs - Qloss) / mrCpr
+    dy4_dt = (UA * (Tr - Tj) - F * Cpc * (Tj - Tc)) / mjCpj
 
-    def scale_action(self, action):
-        action = 0.5 * (action + 1.0)
-        action = action * (self.max_action - self.min_action) + self.min_action
-        return action
+    xdot = np.zeros(4)
+    xdot[0] = dy1_dt  # d[I]/dt
+    xdot[1] = dy2_dt  # d[M]/dt
+    xdot[2] = dy3_dt  # d[Tr]/dt
+    xdot[3] = dy4_dt  # d[Tj]/dt
 
-    def scale_state(self, state):
-        state = (state - self.min_state) / (self.max_state - self.min_state)
-        state = 2.0 * state - 1.0
-        return state
+    return xdot
 
-def get_CSTR1_optlayer(Az):
-    starttime = timer()
-    nominal_production = 0.0
-    num_timesteps = int(9 * 4)
-    n_const_cntrl = int(4)
-    num_x, num_z, num_u = 2, Az.shape[0], 1  # Only one control input now
+# Calculate flow control rate (Fc) based on system state and temperature changes
+def calculate_Fc(Tr, Tj, dTr, dTj, UA, Tc, Cpc, mjCpj):
+    # Use the dynamic heat balance equations for Tj to calculate Fc
+    numerator = (UA * (Tr - Tj) - mjCpj * dTj)
+    denominator = Cpc * (Tj - Tc)
 
-    Az_cp = cp.Parameter(shape=(num_z, num_z))
-    Au_cp = cp.Parameter(shape=(num_z, num_u))
-    ZtoX_cp = cp.Parameter(shape=(num_x, num_z))
-    z_init_cp = cp.Parameter(shape=(num_z,))
+    if abs(denominator) < 1e-5:  # Avoid division by zero
+        return 0.0
+    else:
+        return numerator / denominator
 
-    Z = dict()
-    U = dict()
-    X_slack = dict()
+# Example constants
+Ad = 4.4e16
+Ed = 140.06e3
+Ap = 1.7e11 / 60
+Ep = 16.9e3 / 0.239
+deltaHp = -82.2e3
+UA = 33.3083
+Qc = 650
+Qs = 12.41e-2
+V = 0.5
+Tc = 27
+Tamb = 27
+Cpc = 4.184
+R = 8.3145
+alpha = 1.212827
+beta = 0.000267
+epsilon = 0.5
+theta = 1.25
+m1 = 450
+cp1 = 4.184
+mjCpj = (18 * 4.184) + (240 * 0.49)
+cp2 = 187
+cp3 = 110.58
+cp4 = 84.95
+m5 = 220
+cp5 = 0.49
+m6 = 7900
+cp6 = 0.49
+M0 = 0.7034
+I0 = 4.5e-3
 
-    for t in range(num_timesteps):
-        Z[t] = cp.Variable(shape=num_z)
-    for t in range(num_timesteps-1):
-        U[t] = cp.Variable(shape=num_u)  # Only one control input (1D)
+# Initialize the Koopman Model (this assumes you've already loaded your Koopman model)
+class KoopmanModel:
+    def __init__(self, model_path,settings):
+        self.model = self.load_koopman_model(model_path)
+        self.settings=settings
+    def load_koopman_model(self, path):
+        model_state_dict = torch.load(path, map_location='cpu')
+        model = Koopman(self.settings)  # Assuming your Koopman class is available
+        model.load_state_dict(model_state_dict)
+        model.eval()
+        return model
 
-    for t in range(num_timesteps):
-        X_slack[t] = cp.Variable(shape=num_x, nonneg=True)
+    def predict_next_state(self, current_state, control_input):
+        current_state_tensor = torch.tensor(current_state, dtype=torch.float32)
+        control_input_tensor = torch.tensor(control_input, dtype=torch.float32)
+        next_state = self.model(current_state_tensor, control_input_tensor)
+        return next_state.detach().numpy()
 
-    M_slack = np.array([10_000.0, 10_000.0])
-    constraints = []
-    constraints.append(Z[0] == z_init_cp)
+# Instantiate the Koopman model
+def testit(settings):
+    koopman_model = KoopmanModel('/path/to/pretrained/koopman_model.pth',settings=settings)
 
-    for t in range(num_timesteps):
-        constraints.append(ZtoX_cp @ Z[t] + X_slack[t] >= np.array([0., 0.]))
-        constraints.append(ZtoX_cp @ Z[t] - X_slack[t] <= np.array([1., 1.]))
+    # Initial conditions (current state and control input)
+    Tr_initial = 45.0
+    Tj_initial = 35.0
+    Fc_initial = 0.5
+    initial_state = [I0, M0, Tr_initial, Tj_initial]
 
-    for t in range(num_timesteps-1):
-        constraints.append(U[t] >= np.array([0]))
-        constraints.append(U[t] <= np.array([1.]))
+    # Time step size and number of iterations for simulation
+    time_step = 0.1
+    num_iterations = 10
 
-    for t in range(1, num_timesteps-1):
-        if t % n_const_cntrl != 0:
-            constraints.append(U[t] == U[t-1])
+    # Main loop for running predictions
+    current_state = initial_state
+    current_Fc = Fc_initial
 
-    for t in range(1, num_timesteps):
-        constraints.append(Az_cp @ Z[t-1] + Au_cp @ U[t-1] == Z[t])
+    for i in range(num_iterations):
+        # Get the next state using the Koopman model
+        next_state = koopman_model.predict_next_state(current_state[2:], current_Fc)
+        Tr_next, Tj_next = next_state[0], next_state[1]
 
-    objective = sum(U[t] for t in range(num_timesteps-1))  # Adjusted for 1D U
-    objective += sum(X_slack[t] ** 2 @ M_slack for t in range(num_timesteps))
+        # Calculate the change in temperatures (dTr, dTj)
+        dTr = Tr_next - current_state[2]
+        dTj = Tj_next - current_state[3]
 
-    objective = cp.Minimize(objective)
-    prob = cp.Problem(objective, constraints)
+        # Use the system dynamics to calculate xdot (state evolution)
+        xdot = br(current_state, current_Fc, Ad, Ed, Ap, Ep, deltaHp, UA, Qc, Qs, V, Tc, Cpc, R, alpha, beta, epsilon, theta, m1, cp1, mjCpj, cp2, cp3, cp4, m5, cp5, m6, cp6, M0, I0, Tamb)
 
-    parameters = [Az_cp, Au_cp, ZtoX_cp, z_init_cp]
-    optlayer = CvxpyLayer(prob, parameters=parameters, variables=[U[0]])
+        # Update the control input (Fc) based on the temperature change
+        new_Fc = calculate_Fc(current_state[2], current_state[3], dTr, dTj, UA, Tc, Cpc, mjCpj)
 
-    optlayer.num_timesteps = num_timesteps
-    optlayer.num_x = num_x
-    optlayer.num_z = num_z
-    optlayer.num_u = num_u
-    optlayer.n_const_cntrl = n_const_cntrl
+        # Update the state using Euler's method
+        current_state[0] += xdot[0] * time_step  # Update Ii
+        current_state[1] += xdot[1] * time_step  # Update M
+        current_state[2] += xdot[2] * time_step  # Update Tr
+        current_state[3] += xdot[3] * time_step  # Update Tj
 
-    time = round((timer() - starttime), 2)
-    print('\nTime taken to set up economic OptLayer for MPC Policy: ' + str(time) + ' seconds\n')
-    return optlayer
+        # Update the flow control (Fc)
+        current_Fc = new_Fc
 
-def test_single_state(settings):
-    policy = MPC_Policy(settings)
-    test_state = torch.tensor([45.0, 40.0])
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    test_state = test_state.to(device)
-    predicted_action = policy(test_state)
-    print(f"Predicted action (Fc) for state [Tr, Tj] = [45, 40]: {predicted_action.cpu().detach().numpy()}")
-
-# if __name__ == "__main__":
-#     test_single_state(settings)
+        print(f"Iteration {i+1}: Tr = {Tr_next:.2f}, Tj = {Tj_next:.2f}, Fc = {current_Fc:.2f}, dTr = {dTr:.2f}, dTj = {dTj:.2f}")
