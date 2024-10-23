@@ -29,6 +29,9 @@ def test_model(model, settings):
     # Make predictions using the model
     X_pred = model.multi_step_prediction(X[0, :], U[:-1, :])
 
+    # Ensure X_pred is on the same device as X
+    X_pred = X_pred.to(device)
+
     # Calculate MSE for each state variable and total MSE
     for i, name in enumerate(settings[settings['process']]['state_names']):
         MSEs[name].append(loss_function(X_pred[:, i], X[:, i]).item())
@@ -47,6 +50,7 @@ def test_model(model, settings):
     print(f"Total MSE: {np.mean(MSEs['total'])}")
 
     return None
+
 
 
 def predict_timeseries_closed_loop(model, X, U):
