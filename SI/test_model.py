@@ -9,7 +9,7 @@ import data
 def test_model(model, settings):
     # Load the test dataset
     dataset = data.get_test_dataset(settings)
-    print(dataset)
+    # print(dataset)
 
     # Move the model to the appropriate device (GPU or CPU)
     device = settings['device']  # Assuming settings['device'] is set correctly ('cuda' or 'cpu')
@@ -25,6 +25,8 @@ def test_model(model, settings):
     U = dataset['U'].to(device)  # Move control inputs to the same device
 
     # Make predictions using the model
+    print(X[0,:])
+    print(U[:-1,:])
     X_pred = model.multi_step_prediction(X[0, :], U[:-1, :])
 
     # Ensure X_pred is also on the same device as X
