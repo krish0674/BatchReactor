@@ -26,7 +26,7 @@ class ElementwiseScaler():
 
 def get_train_val_dataloaders(settings):
     dataset = load_raw_data(settings, train_or_test='train')
-    dataset = scale_data(dataset, settings)
+    # dataset = scale_data(dataset, settings)
     train_dataset, val_dataset = train_val_split(dataset, settings)
     
     X0_train, U0_train, X1_train = get_X0_U0_X1(train_dataset, settings)
@@ -116,19 +116,19 @@ if __name__ == '__main__':
     from main import get_settings
     settings = get_settings()
 
-    train_dataloader, val_dataloader = get_train_val_dataloaders(settings)
+    # train_dataloader, val_dataloader = get_train_val_dataloaders(settings)
 
-    for X0_batch, U0_batch, X1_batch in train_dataloader:
-        print(X0_batch.shape, U0_batch.shape, X1_batch.shape)
-        print(X0_batch[0])
-        print(X1_batch[0])
-        print(U0_batch[0])
-        break
+    # for X0_batch, U0_batch, X1_batch in train_dataloader:
+    #     print(X0_batch.shape, U0_batch.shape, X1_batch.shape)
+    #     print(X0_batch[0])
+    #     print(X1_batch[0])
+    #     print(U0_batch[0])
+    #     break
 
-    for X0_val, U0_val, X1_val in val_dataloader:
-        print(X0_val.shape, U0_val.shape, X1_val.shape)
-        break
+    # for X0_val, U0_val, X1_val in val_dataloader:
+    #     print(X0_val.shape, U0_val.shape, X1_val.shape)
+    #     break
 
-    test_dataset = get_test_dataset(settings)
+    # test_dataset = get_test_dataset(settings)
 
-    print('data loading done done')
+    # print('data loading done done')
