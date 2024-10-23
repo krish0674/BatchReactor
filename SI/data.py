@@ -75,7 +75,7 @@ def get_test_dataset(settings):
     return processed_dataset
 
 def get_test_dataloader1(settings):
-    dataset = load_raw_data(settings, train_or_test='train')
+    dataset = load_raw_data(settings, train_or_test='test')
     dataset = scale_data(dataset, settings)
     X0_test, U0_test, X1_test = get_X0_U0_X1(dataset, settings)
     dataset = TensorDataset(
