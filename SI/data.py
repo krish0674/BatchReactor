@@ -26,7 +26,7 @@ class ElementwiseScaler():
 
 def get_train_val_dataloaders(settings):
     dataset = load_raw_data(settings, train_or_test='train')
-    # dataset = scale_data(dataset, settings)
+    dataset = scale_data(dataset, settings)
     train_dataset, val_dataset = train_val_split(dataset, settings)
     
     X0_train, U0_train, X1_train = get_X0_U0_X1(train_dataset, settings)
@@ -88,7 +88,7 @@ def scale_data(dataset, settings):
             min_scaled, max_scaled)
 
         # scale data
-        dataset = scaler.scale(dataset.values)
+        # dataset = scaler.scale(dataset.values)
     else:
         raise ValueError(f"Process {settings['process']} not implemented.")
     return dataset
