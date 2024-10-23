@@ -12,6 +12,7 @@ import training
 from data import get_train_val_dataloaders 
 from data import get_test_dataset,get_test_dataloader1
 import torch 
+from cstr import test_single_state()
 
 def get_settings(args):
     settings = {
@@ -141,20 +142,21 @@ def main():
 
     # test_dataset = get_test_dataset(settings)
 
-    print('data loading done done')
-    print(f"Trained model on {settings['device']} yay")
-    # from data import get_train_val_dataloaders
-    # train_dataloader, val_dataloader = data.get_train_val_dataloaders(settings)
-    model = getattr(networks, settings['model_type'])(settings).to(settings['device'])
-    if settings['train_new_model']:
-        trainer = getattr(training, f"{settings['model_type']}Trainer")(
-            model, train_dataloader, val_dataloader, settings)
-        trainer.train()
+    # print('data loading done done')
+    # print(f"Trained model on {settings['device']} yay")
 
-    model.load_state_dict(torch.load('/kaggle/working/best_val_model.pth', map_location=settings['device']))
+    # model = getattr(networks, settings['model_type'])(settings).to(settings['device'])
+    # if settings['train_new_model']:
+    #     trainer = getattr(training, f"{settings['model_type']}Trainer")(
+    #         model, train_dataloader, val_dataloader, settings)
+    #     trainer.train()
 
-    test_model.test_model_single(model, settings)
-    print('Done!')
+    # model.load_state_dict(torch.load('/kaggle/working/best_val_model.pth', map_location=settings['device']))
+
+    # test_model.test_model_single(model, settings)
+    # print('Done!')
+
+    test_single_state()
 
 if __name__ == "__main__":
     main()
