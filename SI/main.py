@@ -122,41 +122,41 @@ def main():
     args = parser.parse_args()
     settings = get_settings(args)
 
-    # train_dataloader, val_dataloader = get_train_val_dataloaders(settings)
+    train_dataloader, val_dataloader = get_train_val_dataloaders(settings)
 
-    # for X0_batch, U0_batch, X1_batch in train_dataloader:
-    #     print('Train Example:\n')
-    #     print(X0_batch.shape, U0_batch.shape, X1_batch.shape)
-    #     print(X0_batch[3])
-    #     print(X1_batch[3])
-    #     print(U0_batch[3])
-    #     break
+    for X0_batch, U0_batch, X1_batch in train_dataloader:
+        print('Train Example:\n')
+        print(X0_batch.shape, U0_batch.shape, X1_batch.shape)
+        print(X0_batch[3])
+        print(X1_batch[3])
+        print(U0_batch[3])
+        break
 
-    # for X0_val, U0_val, X1_val in val_dataloader:
-    #     print('Val Example:\n')
-    #     print(X0_val.shape, U0_val.shape, X1_val.shape)
-    #     print(X0_val[3])
-    #     print(X1_val[3])
-    #     print(U0_val[3])
-    #     break
+    for X0_val, U0_val, X1_val in val_dataloader:
+        print('Val Example:\n')
+        print(X0_val.shape, U0_val.shape, X1_val.shape)
+        print(X0_val[3])
+        print(X1_val[3])
+        print(U0_val[3])
+        break
 
-    # test_dataset = get_test_dataset(settings)
+    test_dataset = get_test_dataset(settings)
 
-    # print('data loading done done')
-    # print(f"Trained model on {settings['device']} yay")
+    print('data loading done done')
+    print(f"Trained model on {settings['device']} yay")
 
-    # model = getattr(networks, settings['model_type'])(settings).to(settings['device'])
-    # if settings['train_new_model']:
-    #     trainer = getattr(training, f"{settings['model_type']}Trainer")(
-    #         model, train_dataloader, val_dataloader, settings)
-    #     trainer.train()
+    model = getattr(networks, settings['model_type'])(settings).to(settings['device'])
+    if settings['train_new_model']:
+        trainer = getattr(training, f"{settings['model_type']}Trainer")(
+            model, train_dataloader, val_dataloader, settings)
+        trainer.train()
 
-    # model.load_state_dict(torch.load('/kaggle/working/best_val_model.pth', map_location=settings['device']))
+    model.load_state_dict(torch.load('/kaggle/working/best_val_model.pth', map_location=settings['device']))
 
-    # test_model.test_model_single(model, settings)
-    # print('Done!')
+    test_model.test_model_single(model, settings)
+    print('Done!')
 
-    testit(settings)
+    # testit(settings)
 
 if __name__ == "__main__":
     main()
