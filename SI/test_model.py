@@ -6,37 +6,41 @@ import matplotlib.pyplot as plt
 
 # Local imports
 import data
-
 def test_model(model, settings):
-    dataset = data.get_test_dataset(settings)
-    print(dataset)
+    dataset = data.get_test_dataset(settings)  # Load dataset
+    # print(dataset)  # Check structure of the dataset
+
     loss_function = settings['loss_function']()
 
     MSEs = {k: [] for k in settings[settings['process']]['state_names']}
     MSEs['total'] = []
 
-    # loop through test datasets
-    for i_tds, tds in dataset.items():
-        X = tds['X']
-        U = tds['U']
+    # Access X and U directly from the dataset (no need for iteration)
+    X = dataset['X']
+    U = dataset['U']
 
-        # X_pred = predict_timeseries_closed_loop(model, X, U)
-        X_pred = model.multi_step_prediction(X[0, :], U[:-1,:])
+    # Make predictions using the model (adjust according to your model's forward function)
+    X_pred = model.multi_step_prediction(X[0, :], U[:-1, :])
 
-        for i, name in enumerate(settings[settings['process']]['state_names']):
-            MSEs[name].append(loss_function(X_pred[:, i], X[:, i]).item())
-        MSEs['total'].append(loss_function(X_pred, X).item())
+    # Calculate MSE for each state variable and the total MSE
+    for i, name in enumerate(settings[settings['process']]['state_names']):
+        MSEs[name].append(loss_function(X_pred[:, i], X[:, i]).item())
+    MSEs['total'].append(loss_function(X_pred, X).item())
 
-        if settings['plot_test']:
-            plot_test_trajectory(X, U, X_pred,
-                                 {k: v[-1] for k, v in MSEs.items()},
-                                 i_tds, settings)
+    # If plotting is enabled, visualize the results
+    if settings['plot_test']:
+        plot_test_trajectory(X, U, X_pred,
+                             {k: v[-1] for k, v in MSEs.items()},
+                             'test', settings)
 
+    # Print the test results
     print(f"\nTest results for {settings['model_name']}:")
     for name in settings[settings['process']]['state_names']:
         print(f"{name} MSE: {np.mean(MSEs[name])}")
     print(f"Total MSE: {np.mean(MSEs['total'])}")
+    
     return None
+
 
 def predict_timeseries_closed_loop(model, X, U):
     x = X[0, :]
