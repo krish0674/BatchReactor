@@ -56,9 +56,9 @@ def get_settings(args):
         # Process-specific settings
         'CSTR1': {
             'n_states':      2,
-            'n_controls':    2,
-            'state_names':   ['c', 'T'],
-            'control_names': ['roh', 'Fc'],
+            'n_controls':    1,
+            'state_names':   ['Tr', 'Tj'],
+            'control_names': ['Fc'],
             'state_scaling': {
                 'min_unscaled': np.array([0.9*0.1367, 0.8*0.7293]),
                 'max_unscaled': np.array([1.1*0.1367, 1.2*0.7293]),
