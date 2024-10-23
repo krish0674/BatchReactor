@@ -6,7 +6,7 @@ import pandas as pd
 class ElementwiseScaler():
     # scales and unscales a vector elementwise
     # min and max should be np.arrays of the same shape as the vector x
-    def _init_(self, min_unscaled, max_unscaled, min_scaled, max_scaled):
+    def __init__(self, min_unscaled, max_unscaled, min_scaled, max_scaled):
         self.min_unscaled = min_unscaled
         self.max_unscaled = max_unscaled
         self.range_unscaled = max_unscaled - min_unscaled
@@ -100,19 +100,20 @@ def train_val_split(dataset, settings, random_split=True):
     split_index = int(np.floor(settings['train_val_ratio'] * len(dataset)))
     train_indices, val_indices = indices[:split_index], indices[split_index:]
 
-    # Use array indexing instead of iloc for NumPy arrays
-    train_dataset = dataset[train_indices]
-    val_dataset = dataset[val_indices]
+    # Use .iloc for pandas DataFrame
+    train_dataset = dataset.iloc[train_indices]
+    val_dataset = dataset.iloc[val_indices]
     return train_dataset, val_dataset
 
 def get_X0_U0_X1(dataset, settings):
-    X0 = dataset[:-1, [2, 3]]  # dont need last column
-    U0 = dataset[:-1, [0]]  
-    X1 = dataset[1:, [2, 3]]  # start from 1 
-
+    # Use .iloc for pandas DataFrame
+    X0 = dataset.iloc[:-1, [2, 3]].values  # don't need last column
+    U0 = dataset.iloc[:-1, [0]].values  
+    X1 = dataset.iloc[1:, [2, 3]].values  # start from 1 
     return X0, U0, X1
 
-if __name__ == '_main_':
+
+if __name__ == '__main__':
     from main import get_settings
     settings = get_settings()
 
