@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 from networks import Koopman
+import networks
 
 # Define dynamic system equations (based on the image provided)
 def br(x, u, Ad, Ed, Ap, Ep, deltaHp, UA, Qc, Qs, V, Tc, Cpc, R, alpha, beta, epsilon, theta, m1, cp1, mjCpj, cp2, cp3, cp4, m5, cp5, m6, cp6, M0, I0, Tamb):
@@ -83,7 +84,7 @@ class KoopmanModel:
         self.settings=settings
     def load_koopman_model(self, path):
         model_state_dict = torch.load(path, map_location='cpu')
-        model = Koopman(self.settings)  # Assuming your Koopman class is available
+        model = getattr(networks, self.settings['model_type'])(self.settings).to(self.settings['device'])
         model.load_state_dict(model_state_dict)
         model.eval()
         return model
