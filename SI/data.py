@@ -58,6 +58,7 @@ def get_test_dataset(settings):
         dataset[k] = T.tensor(v.values, dtype=settings['accuracy'])
     
     if settings['process'] == 'CSTR1':
+        print(dataset)
         for k, v in dataset.items():
             dataset[k] = {
                 'X': v[:,[1,2]],
