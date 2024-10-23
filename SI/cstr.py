@@ -96,7 +96,7 @@ class KoopmanModel:
 
 # Instantiate the Koopman model
 def testit(settings):
-    koopman_model = KoopmanModel('/path/to/pretrained/koopman_model.pth',settings=settings)
+    koopman_model = KoopmanModel('/kaggle/working/best_val_model.pth',settings=settings)
 
     # Initial conditions (current state and control input)
     Tr_initial = 45.0
