@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+import matplotlib.pyplot as plt
 from networks import Koopman
 import networks
 
@@ -37,7 +38,6 @@ def br(x, u, Ad, Ed, Ap, Ep, deltaHp, UA, Qc, Qs, V, Tc, Cpc, R, alpha, beta, ep
 
 # Calculate flow control rate (Fc) based on system state and temperature changes
 def calculate_Fc(Tr, Tj, dTr, dTj, UA, Tc, Cpc, mjCpj):
-    # Use the dynamic heat balance equations for Tj to calculate Fc
     numerator = (UA * (Tr - Tj) - mjCpj * dTj)
     denominator = Cpc * (Tj - Tc)
 
@@ -79,24 +79,23 @@ I0 = 4.5e-3
 
 # Initialize the Koopman Model (this assumes you've already loaded your Koopman model)
 class KoopmanModel:
-    def __init__(self, settings):
-        self.settings = settings  # Ensure settings are passed and stored correctly
+    def __init__(self,settings):
         self.model = self.load_koopman_model('/kaggle/working/best_val_model.pth')
-
+        self.settings=settings
     def load_koopman_model(self, path):
-        model_state_dict = torch.load(path, map_location=self.settings['device'])  # Use the correct device
+        model_state_dict = torch.load(path, map_location='cpu')
         model = getattr(networks, self.settings['model_type'])(self.settings).to(self.settings['device'])
         model.load_state_dict(model_state_dict)
         model.eval()
         return model
 
     def predict_next_state(self, current_state, control_input):
-        current_state_tensor = torch.tensor(current_state, dtype=torch.float32).unsqueeze(0).to(self.settings['device'])  # Add batch dimension
-        control_input_tensor = torch.tensor(control_input, dtype=torch.float32).unsqueeze(0).to(self.settings['device'])  # Add batch dimension
+        current_state_tensor = torch.tensor(current_state, dtype=torch.float32).unsqueeze(0).to(self.settings['device'])
+        control_input_tensor = torch.tensor(control_input, dtype=torch.float32).unsqueeze(0).to(self.settings['device'])
         next_state = self.model(current_state_tensor, control_input_tensor)
-        return next_state.squeeze(0).detach().cpu().numpy()  # Remove batch dimension before returning
+        return next_state.squeeze(0).detach().cpu().numpy()
 
-# Instantiate the Koopman model and run the simulation
+# Instantiate the Koopman model
 def testit(settings):
     koopman_model = KoopmanModel(settings)
 
@@ -107,8 +106,12 @@ def testit(settings):
     initial_state = [I0, M0, Tr_initial, Tj_initial]
 
     # Time step size and number of iterations for simulation
-    time_step = 0.1
-    num_iterations = 10
+    time_step = 0.01  # smaller time step for stability
+    num_iterations = 100  # increased iterations
+
+    Tr_values = []
+    Tj_values = []
+    Fc_values = []
 
     # Main loop for running predictions
     current_state = initial_state
@@ -128,6 +131,7 @@ def testit(settings):
 
         # Update the control input (Fc) based on the temperature change
         new_Fc = calculate_Fc(current_state[2], current_state[3], dTr, dTj, UA, Tc, Cpc, mjCpj)
+        new_Fc = np.clip(new_Fc, 0.0, 1.0)  # Clamp Fc between 0 and 1
 
         # Update the state using Euler's method
         current_state[0] += xdot[0] * time_step  # Update Ii
@@ -135,8 +139,17 @@ def testit(settings):
         current_state[2] += xdot[2] * time_step  # Update Tr
         current_state[3] += xdot[3] * time_step  # Update Tj
 
+        # Store the values for plotting
+        Tr_values.append(current_state[2])
+        Tj_values.append(current_state[3])
+        Fc_values.append(new_Fc)
+
         # Update the flow control (Fc)
         current_Fc = new_Fc
 
         print(f"Iteration {i+1}: Tr = {Tr_next:.2f}, Tj = {Tj_next:.2f}, Fc = {current_Fc:.2f}, dTr = {dTr:.2f}, dTj = {dTj:.2f}")
 
+    # Plot the results
+    plt.figure(figsize=(10, 6))
+    plt.plot(Tr_values, label="Tr (Reactor Temperature)")
+   
