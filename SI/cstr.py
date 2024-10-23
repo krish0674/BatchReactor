@@ -79,11 +79,12 @@ I0 = 4.5e-3
 
 # Initialize the Koopman Model (this assumes you've already loaded your Koopman model)
 class KoopmanModel:
-    def __init__(self,settings):
+    def __init__(self, settings):
+        self.settings = settings  # Set the settings here
         self.model = self.load_koopman_model('/kaggle/working/best_val_model.pth')
-        self.settings=settings
+
     def load_koopman_model(self, path):
-        model_state_dict = torch.load(path, map_location='cpu')
+        model_state_dict = torch.load(path, map_location=self.settings['device'])  # Use the correct device
         model = getattr(networks, self.settings['model_type'])(self.settings).to(self.settings['device'])
         model.load_state_dict(model_state_dict)
         model.eval()
@@ -152,4 +153,8 @@ def testit(settings):
     # Plot the results
     plt.figure(figsize=(10, 6))
     plt.plot(Tr_values, label="Tr (Reactor Temperature)")
-   
+    plt.plot(Tj_values, label="Tj (Jacket Temperature)")
+    plt.plot(Fc_values, label="Fc (Flow Control)")
+    plt.xlabel("Time step")
+    plt.ylabel("Values")
+    plt.legend()
