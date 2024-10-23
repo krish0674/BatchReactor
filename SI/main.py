@@ -156,7 +156,7 @@ def main():
     # test_model.test_model_single(model, settings)
     # print('Done!')
 
-    test_single_state()
+    test_single_state(settings)
 
 if __name__ == "__main__":
     main()
