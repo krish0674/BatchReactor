@@ -12,7 +12,7 @@ import training
 from data import get_train_val_dataloaders 
 from data import get_test_dataset,get_test_dataloader1
 import torch 
-from cstr import test_single_state
+from cstr import testit
 
 def get_settings(args):
     settings = {
@@ -156,7 +156,7 @@ def main():
     # test_model.test_model_single(model, settings)
     # print('Done!')
 
-    test_single_state(settings)
+    testit(settings)
 
 if __name__ == "__main__":
     main()
