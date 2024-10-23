@@ -71,7 +71,7 @@ class Trainer():
             self.best_val_loss = val_loss
             self.best_val_epoch = self.epoch
             # self.model.save_self(name_suffix='best_val')
-            torch.save(self.model.state_dict(), './kaggle/working/best_val_model.pth')
+            torch.save(self.model.state_dict(), '/kaggle/working/best_val_model.pth')
         return None
 
     def print_epoch_info(self):
