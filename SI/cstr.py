@@ -75,11 +75,11 @@ def get_CSTR1_optlayer(Az):
     constraints.append(Z[0] == z_init_cp)
 
     for t in range(num_timesteps):
-        constraints.append(ZtoX_cp @ Z[t] + X_slack[t] >= np.array([-1., -1.]))
+        constraints.append(ZtoX_cp @ Z[t] + X_slack[t] >= np.array([0., 0.]))
         constraints.append(ZtoX_cp @ Z[t] - X_slack[t] <= np.array([1., 1.]))
 
     for t in range(num_timesteps-1):
-        constraints.append(U[t] >= np.array([-1.]))
+        constraints.append(U[t] >= np.array([0]))
         constraints.append(U[t] <= np.array([1.]))
 
     for t in range(1, num_timesteps-1):
