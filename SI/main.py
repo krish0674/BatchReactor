@@ -140,7 +140,7 @@ def main():
         print(U0_val[3])
         break
 
-    test_dataset = get_test_dataset(settings)
+    # test_dataset = get_test_dataset(settings)
 
     print('data loading done done')
     print(f"Trained model on {settings['device']} yay")
