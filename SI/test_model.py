@@ -97,6 +97,7 @@ def predict_timeseries_closed_loop(model, X, U):
         X_pred[t+1, :] = x
     return X_pred
 
+
 def plot_test_trajectory(X, U, X_pred, MSEs, i_tds, settings):
     # convert to pandas dataframes
     X = pd.DataFrame(X.detach().to(T.device('cpu')).numpy(), columns=settings[settings['process']]['state_names'])

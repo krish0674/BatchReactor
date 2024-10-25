@@ -3,6 +3,7 @@ from torch.utils.data import DataLoader, TensorDataset
 import numpy as np
 import pandas as pd
 
+
 class ElementwiseScaler():
     # scales and unscales a vector elementwise
     # min and max should be np.arrays of the same shape as the vector x
