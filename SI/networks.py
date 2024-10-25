@@ -151,6 +151,8 @@ class Koopman(Predictor):
             X_pred[t+1, :] = self.decode(z)
         return X_pred
 
+
+
 class Linear(Predictor):
     def __init__(self, settings):
         super().__init__(settings)
@@ -193,6 +195,8 @@ class Linear(Predictor):
         for t in range(U.shape[0]):
             X_pred[t+1, :] = self.forward(X_pred[t, :], U[t, :])
         return X_pred
+
+
 
 class MLP(Predictor):
     def __init__(self, settings):

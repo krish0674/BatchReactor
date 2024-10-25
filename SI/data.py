@@ -127,7 +127,7 @@ def train_val_split(dataset, settings, random_split=True):
 
 def get_X0_U0_X1(dataset, settings):
     # Use .iloc for pandas DataFrame
-    X0 = dataset.iloc[:-1, [2, 3]].values  # don't need last column
+    X0 = dataset.iloc[:-1, [2, 3]].values  # don't need last column WRONG
     U0 = dataset.iloc[:-1, [0]].values
     X1 = dataset.iloc[1:, [2, 3]].values  # start from 1 
     return X0, U0, X1
