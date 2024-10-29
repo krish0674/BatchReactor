@@ -101,12 +101,11 @@ def scale_data(dataset, settings):
         max_unscaled = np.concatenate((
             settings['CSTR1']['state_scaling']['max_unscaled'],
             settings['CSTR1']['action_scaling']['max_unscaled']))
-        min_scaled = np.array([-1.0, -1.0, -1.0])
-        max_scaled = np.array([1.0, 1.0, 1.0])
+        min_scaled = np.array([-1.0, -1.0, -1.0,-1.0])
+        max_scaled = np.array([1.0, 1.0, 1.0,1.0])
         scaler = ElementwiseScaler(
             min_unscaled, max_unscaled,
             min_scaled, max_scaled)
-
         # scale data
         dataset = scaler.scale(dataset.values)
     else:
