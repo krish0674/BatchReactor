@@ -65,9 +65,9 @@ def get_settings(args):
             'state_names':   ['Tr', 'Tj'],
             'control_names': ['Fc'],
             'state_scaling': {
-                'min_unscaled': np.array([0.9*29.317715,0.9*34.946917, 0.9*30.485979]),
+                'min_unscaled': np.array([29.317715,34.946917, 30.485979]),
                 #Tc,Tr,Tj respectively
-                'max_unscaled': np.array([1.1*35.286022,1.1*90.839534, 1.1*60.022752]),
+                'max_unscaled': np.array([35.286022,90.839534,60.022752]),
                 'min_scaled':   np.array([-1.0, -1.0]),
                 'max_scaled':   np.array([1.0, 1.0]),
             },
