@@ -17,12 +17,12 @@ class ElementwiseScaler():
 
     def scale(self, x):
         x = (x - self.min_unscaled) / self.range_unscaled
-        x = x * self.range_scaled + self.min_scaled
+        # x = x * self.range_scaled + self.min_scaled
         return x
 
     def unscale(self, x):
         x = (x - self.min_scaled) / self.range_scaled
-        x = x * self.range_unscaled + self.min_unscaled
+        # x = x * self.range_unscaled + self.min_unscaled
         return x
 
 def get_train_val_dataloaders(settings):
