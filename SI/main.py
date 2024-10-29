@@ -12,7 +12,7 @@ import training
 from data import get_train_val_dataloaders 
 from data import get_test_dataset,get_test_dataloader1
 import torch 
-from cstr import testit
+# from cstr import testit
 
 def get_settings(args):
     settings = {
