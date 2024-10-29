@@ -121,15 +121,15 @@ def train_val_split(dataset, settings, random_split=True):
     train_indices, val_indices = indices[:split_index], indices[split_index:]
 
     # Use .iloc for pandas DataFrame
-    train_dataset = dataset.iloc[train_indices]
-    val_dataset = dataset.iloc[val_indices]
+    train_dataset = dataset[train_indices]
+    val_dataset = dataset[val_indices]
     return train_dataset, val_dataset
 
 def get_X0_U0_X1(dataset, settings):
     # Use .iloc for pandas DataFrame
-    X0 = dataset.iloc[:-1, [2, 3]].values  # don't need second column Tc - only one control input needed
-    U0 = dataset.iloc[:-1, [0]].values
-    X1 = dataset.iloc[1:, [2, 3]].values  # start from 1 
+    X0 = dataset[:-1, [2, 3]].values  # don't need second column Tc - only one control input needed
+    U0 = dataset[:-1, [0]].values
+    X1 = dataset[1:, [2, 3]].values  # start from 1 
     return X0, U0, X1
 
 
