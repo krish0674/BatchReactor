@@ -97,11 +97,11 @@ def scale_data(dataset, settings):
     if settings['process'] == 'CSTR1':
         # Adjust the scaler initialization as needed
         min_unscaled = np.concatenate((
-            settings['CSTR1']['state_scaling']['min_unscaled'],
-            settings['CSTR1']['action_scaling']['min_unscaled']))
+            settings['CSTR1']['action_scaling']['min_unscaled'],
+            settings['CSTR1']['state_scaling']['min_unscaled']))
         max_unscaled = np.concatenate((
-            settings['CSTR1']['state_scaling']['max_unscaled'],
-            settings['CSTR1']['action_scaling']['max_unscaled']))
+            settings['CSTR1']['action_scaling']['max_unscaled'],
+            settings['CSTR1']['state_scaling']['max_unscaled']))
         min_scaled = np.array([-1.0, -1.0, -1.0,-1.0])
         max_scaled = np.array([1.0, 1.0, 1.0,1.0])
         scaler = ElementwiseScaler(
