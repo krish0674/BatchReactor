@@ -8,6 +8,10 @@ import cvxpy as cp
 from cvxpylayers.torch import CvxpyLayer
 from timeit import default_timer as timer
 
+#change optlayer based on cvxp documentation
+#change from two control to one 
+#optlayer constarits almost same 
+
 sec_per_hour = 60.0 * 60.0
 
 class MLP_Policy(torch.nn.Module):

@@ -1,6 +1,7 @@
 import torch
 from torchdiffeq import odeint
 
+#change all formulars to ours ,ask sir for sample code
 
 SEC_PER_HR = 60.0 * 60.0
 

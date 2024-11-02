@@ -1,5 +1,9 @@
 import torch
 
+
+#remove price and storage 
+
+
 # TODO: think how to optimize critic NN
 class Critic(torch.nn.Module):
     def __init__(self):

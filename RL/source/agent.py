@@ -12,6 +12,8 @@ from source.critic import Critic
 from source.environment import Environment, EnvironmentParameters
 from source.memory import Memory
 
+#need to chnage this fully, right now multiple environments are initialised ,but we need only 1 
+#needs to be changes in conjunction with environmynt.py
 
 class Agent:
     def __init__(self, num_environments: int, short_horizon_length: int,

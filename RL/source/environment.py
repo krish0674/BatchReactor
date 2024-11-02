@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from source.cstr import CSTR, CSTRParameters
 from torch.nn import functional as F
 
+#use our data setpoint to calculate reward
+#remove price and storage
 
 SEC_PER_HR = 60.0 * 60.0
 
