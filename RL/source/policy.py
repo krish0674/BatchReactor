@@ -10,7 +10,7 @@ from timeit import default_timer as timer
 
 #change optlayer based on cvxp documentation
 #change from two control to one 
-#optlayer constarits almost same 
+#optlayer constraints almost same ,se paper 
 
 sec_per_hour = 60.0 * 60.0
 
