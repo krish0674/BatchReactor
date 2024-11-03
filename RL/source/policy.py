@@ -108,6 +108,7 @@ class MPC_Policy(nn.Module):
 
         # extract different parts of the current environment state
         state   = self.scale_state(observation[:, :2])
+        #remove storage and prices
         storage = observation[:, 2].unsqueeze(1)
         prices  = observation[:, 3:]
 
@@ -150,7 +151,7 @@ class MPC_Policy(nn.Module):
         state = 2.0 * state - 1.0
         return state
 
-def get_CSTR1_optlayer(Az):
+def get_CSTR1_optlayer(Az): #do for our reactor
     starttime = timer()
 
     # settings
