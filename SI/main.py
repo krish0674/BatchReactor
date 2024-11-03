@@ -68,8 +68,8 @@ def get_settings(args):
                 'min_unscaled': np.array([29.317715,34.946917, 30.485979]),
                 #Tc,Tr,Tj respectively
                 'max_unscaled': np.array([35.286022,90.839534,60.022752]),
-                'min_scaled':   np.array([-1.0, -1.0]),
-                'max_scaled':   np.array([1.0, 1.0]),
+                'min_scaled':   np.array([-1.0, -1.0, -1.0]),
+                'max_scaled':   np.array([1.0, 1.0, 1.0]),
             },
             'action_scaling': {
                 'min_unscaled': np.array([0.125000]),
