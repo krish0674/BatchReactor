@@ -89,7 +89,7 @@ class Koopman(Predictor):
         # decoder
         self.decoder = T.nn.Linear(
             in_features = self.latent_dim,
-            out_features = n_states,
+            out_features = 1,
             bias=False)
 
     def encode(self, x):
@@ -114,7 +114,7 @@ class Koopman(Predictor):
         '''
         z: latent state
         u: action
-        z_: next latent state
+        z_: next action
         '''
         z, u = self.ensure_batch_shape(x=z, u=u)
         z_ = self.Az(z) + self.Au(u)

@@ -60,7 +60,7 @@ def get_test_dataset(settings):
     
     # If 'dataset' is a pandas DataFrame, convert to tensor or extract columns accordingly
     if settings['process'] == 'CSTR1':
-        print(dataset)
+        # print(dataset)
 
         # Extract X (Tr, Tj) and U (Fc)
         X = T.tensor(dataset[['Tr', 'Tj']].values, dtype=settings['accuracy'])  # State variables (Tr and Tj)
@@ -130,8 +130,9 @@ def get_X0_U0_X1(dataset, settings):
     # Use .iloc for pandas DataFrame
     X0 = dataset[:-1, [2, 3]]  # don't need second column Tc - only one control input needed
     U0 = dataset[:-1, [0]]
-    X1 = dataset[1:, [2, 3]]  # start from 1 
-    return X0, U0, X1
+    # X1 = dataset[1:, [2, 3]]  # start from 1 
+    U1=dataset[1:,[0]]
+    return X0, U0, U1
 
 
 if __name__ == '__main__':

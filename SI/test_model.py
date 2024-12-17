@@ -67,15 +67,15 @@ def test_model_single(model, settings):
     num_batches = 0
 
     for row in dataset:
-        X0, U0, X1 = row  
+        X0, U0, U1 = row  
         X0 = X0.to(settings['device'])
         U0 = U0.to(settings['device'])
-        X1 = X1.to(settings['device'])
-        print(X1)
-        x1_pred = model(X0, U0)
-        print(x1_pred)
+        U1 = U1.to(settings['device'])
+        print(U1)
+        u1_pred = model(X0, U0)
+        print(u1_pred)
 
-        val_loss = criterion(x1_pred, X1)
+        val_loss = criterion(u1_pred, U1)
 
         total_loss += val_loss.item()
         num_batches += 1
