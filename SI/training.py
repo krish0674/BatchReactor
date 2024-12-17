@@ -139,14 +139,15 @@ class KoopmanTrainer(Trainer):
         Z1_pred = self.model.predict(Z0, U0)
         Z1 = self.model.encode(X1)
 
-        ae_loss = self.loss_function(self.model.decode(Z0), X0)
+        # ae_loss = self.loss_function(self.model.decode(Z0), X0)
         pred_loss = self.loss_function(Z1_pred, Z1)
         comb_loss = self.loss_function(self.model.decode(Z1_pred), X1)
-        total_loss = self.loss_weights['ae_loss'] * ae_loss\
-                   + self.loss_weights['pred_loss'] * pred_loss\
+        total_loss = self.loss_weights['pred_loss'] * pred_loss\
                    + self.loss_weights['comb_loss'] * comb_loss
+        # self.loss_weights['ae_loss'] * ae_loss\ + 
+                   
         
-        self.log_batch_loss(ae_loss, pred_loss, comb_loss,
+        self.log_batch_loss( pred_loss, comb_loss,
                             total_loss, train_or_val)
         return total_loss
 
