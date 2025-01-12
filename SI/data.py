@@ -16,8 +16,8 @@ class ElementwiseScaler():
         self.range_scaled = max_scaled - min_scaled
 
     def scale(self, x):
-        x = (x - self.min_unscaled) / self.range_unscaled
-        x = x * self.range_scaled + self.min_scaled  # Scale to target range
+        # x = (x - self.min_unscaled) / self.range_unscaled
+        # x = x * self.range_scaled + self.min_scaled  # Scale to target range
         return x
 
     def unscale(self, x):
@@ -56,7 +56,7 @@ def get_train_val_dataloaders(settings):
 
 def get_test_dataset(settings):
     dataset = load_raw_data(settings, train_or_test='test')
-    #dataset = scale_data(dataset, settings)
+    dataset = scale_data(dataset, settings)
     
     # If 'dataset' is a pandas DataFrame, convert to tensor or extract columns accordingly
     if settings['process'] == 'CSTR1':
@@ -78,7 +78,7 @@ def get_test_dataset(settings):
 
 def get_test_dataloader1(settings):
     dataset = load_raw_data(settings, train_or_test='test')
-    #dataset = scale_data(dataset, settings)
+    dataset = scale_data(dataset, settings)
     X0_test, U0_test, X1_test = get_X0_U0_X1(dataset, settings)
     dataset = TensorDataset(
         T.tensor(X0_test, dtype=settings['accuracy']),
@@ -108,7 +108,7 @@ def scale_data(dataset, settings):
             min_unscaled, max_unscaled,
             min_scaled, max_scaled)
         # scale data
-        #dataset = scaler.scale(dataset.values)
+        dataset = scaler.scale(dataset.values)
     else:
         raise ValueError(f"Process {settings['process']} not implemented.")
     return dataset
