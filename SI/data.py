@@ -16,8 +16,8 @@ class ElementwiseScaler():
         self.range_scaled = max_scaled - min_scaled
 
     def scale(self, x):
-        # x = (x - self.min_unscaled) / self.range_unscaled
-        # x = x * self.range_scaled + self.min_scaled  # Scale to target range
+        x = (x - self.min_unscaled) / self.range_unscaled
+        x = x * self.range_scaled + self.min_scaled  # Scale to target range
         return x
 
     def unscale(self, x):

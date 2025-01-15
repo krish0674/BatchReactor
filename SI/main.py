@@ -125,7 +125,7 @@ def main():
     settings = get_settings(args)
 
     train_dataloader, val_dataloader = get_train_val_dataloaders(settings)
-
+    
     for X0_batch, U0_batch, X1_batch in train_dataloader:
         print('Train Example:\n')
         print(X0_batch.shape, U0_batch.shape, X1_batch.shape)
