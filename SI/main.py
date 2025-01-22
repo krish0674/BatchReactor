@@ -113,7 +113,7 @@ def main():
     parser.add_argument('--train_val_ratio', type=float, default=0.8, help='Training to validation data ratio')
     parser.add_argument('--plot_test', type=bool, default=True, help='Whether to plot test results')
     parser.add_argument('--train_data_path', type=str,default='/kaggle/input/variant-h/Opeloop_HFc_TrTj.xlsx', required=True, help='Path to the training data')
-    parser.add_argument('--test_data_path', type=str,default='/kaggle/input/si-data/Test_Signal_Data.csv', required=True, help='Path to the testing data')
+    parser.add_argument('--test_data_path', type=str,default='/kaggle/input/si-data/Test_Signal_Data.csv', required=False, help='Path to the testing data')
     parser.add_argument('--MLP_hidden_layer_sizes', type=str, default='10,10', help='Comma-separated list of MLP hidden layer sizes')
     parser.add_argument('--Koopman_latent_dim', type=int, default=8, help='Latent dimension size for Koopman model')
     parser.add_argument('--Koopman_encoder_n_hidden_layers', type=int, default=2, help='Number of hidden layers in Koopman encoder')
