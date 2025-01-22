@@ -66,14 +66,14 @@ def get_settings(args):
             'control_names': ['Fc','H'],
             'state_scaling': {
                 'min_unscaled': np.array([42.444027359784,35.69237508100001]),
-                #Tc,Tr,Tj respectively
+                #Tr,Tj 
                 'max_unscaled': np.array([69.39558371041198,48.1877254029999]),
                 'min_scaled':   np.array([-1.0, -1.0]),
                 'max_scaled':   np.array([1.0, 1.0]),
             },
             'action_scaling': {
                 'min_unscaled': np.array([0.23536076041497433,4.0]),
-                #Fc
+                #H,Fc
                 'max_unscaled': np.array([20.0,19.999997463454676]),
                 'min_scaled':   np.array([-1.0,-1.0]),
                 'max_scaled':   np.array([1.0,1.0]),

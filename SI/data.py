@@ -65,7 +65,7 @@ def get_test_dataset(settings):
 
         # Extract X (Tr, Tj) and U (Fc)
         X = T.tensor(dataset[['Tr', 'Tj']].values, dtype=settings['accuracy'])  # State variables (Tr and Tj)
-        U = T.tensor(dataset[['H','Fc']].values, dtype=settings['accuracy']).unsqueeze(1)  # Control input (Fc)
+        U = T.tensor(dataset[['H','Fc']].values, dtype=settings['accuracy'])
         
         # Return X and U as a dictionary
         processed_dataset = {
