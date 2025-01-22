@@ -61,22 +61,22 @@ def get_settings(args):
         # Process-specific settings
         'CSTR1': {
             'n_states':      2,
-            'n_controls':    1,
+            'n_controls':    2,
             'state_names':   ['Tr', 'Tj'],
-            'control_names': ['Fc'],
+            'control_names': ['Fc','H'],
             'state_scaling': {
-                'min_unscaled': np.array([29.317715,34.946917, 30.485979]),
+                'min_unscaled': np.array([42.444027359784,35.69237508100001]),
                 #Tc,Tr,Tj respectively
-                'max_unscaled': np.array([35.286022,90.839534,60.022752]),
-                'min_scaled':   np.array([-1.0, -1.0, -1.0]),
-                'max_scaled':   np.array([1.0, 1.0, 1.0]),
+                'max_unscaled': np.array([69.39558371041198,48.1877254029999]),
+                'min_scaled':   np.array([-1.0, -1.0]),
+                'max_scaled':   np.array([1.0, 1.0]),
             },
             'action_scaling': {
-                'min_unscaled': np.array([0.125000]),
+                'min_unscaled': np.array([0.23536076041497433,4.0]),
                 #Fc
-                'max_unscaled': np.array([0.998277]),
-                'min_scaled':   np.array([-1.0]),
-                'max_scaled':   np.array([1.0]),
+                'max_unscaled': np.array([20.0,19.999997463454676]),
+                'min_scaled':   np.array([-1.0,-1.0]),
+                'max_scaled':   np.array([1.0,1.0]),
             },
             'dataset_name': 'Test_Signal_Train',
             'testset_name': 'Test_Signal_Test',
@@ -112,7 +112,7 @@ def main():
     parser.add_argument('--early_stopping_patience', type=int, default=500, help='Patience for early stopping')
     parser.add_argument('--train_val_ratio', type=float, default=0.8, help='Training to validation data ratio')
     parser.add_argument('--plot_test', type=bool, default=True, help='Whether to plot test results')
-    parser.add_argument('--train_data_path', type=str,default='/kaggle/input/si-data/Test_Signal_Data.csv', required=True, help='Path to the training data')
+    parser.add_argument('--train_data_path', type=str,default='/kaggle/input/variant-h/Opeloop_HFc_TrTj.xlsx', required=True, help='Path to the training data')
     parser.add_argument('--test_data_path', type=str,default='/kaggle/input/si-data/Test_Signal_Data.csv', required=True, help='Path to the testing data')
     parser.add_argument('--MLP_hidden_layer_sizes', type=str, default='10,10', help='Comma-separated list of MLP hidden layer sizes')
     parser.add_argument('--Koopman_latent_dim', type=int, default=8, help='Latent dimension size for Koopman model')

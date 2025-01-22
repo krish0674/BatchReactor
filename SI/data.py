@@ -64,7 +64,7 @@ def get_test_dataset(settings):
 
         # Extract X (Tr, Tj) and U (Fc)
         X = T.tensor(dataset[['Tr', 'Tj']].values, dtype=settings['accuracy'])  # State variables (Tr and Tj)
-        U = T.tensor(dataset['Fc'].values, dtype=settings['accuracy']).unsqueeze(1)  # Control input (Fc)
+        U = T.tensor(dataset[['H','Fc']].values, dtype=settings['accuracy']).unsqueeze(1)  # Control input (Fc)
         
         # Return X and U as a dictionary
         processed_dataset = {
@@ -90,7 +90,7 @@ def get_test_dataloader1(settings):
     return test_dataloader
 
 def load_raw_data(settings, train_or_test):
-    dataset = pd.read_csv(settings[f'{train_or_test}_data_path'])
+    dataset = pd.read_excel(settings[f'{train_or_test}_data_path'])
     return dataset
 
 def scale_data(dataset, settings):
@@ -128,9 +128,9 @@ def train_val_split(dataset, settings, random_split=True):
 
 def get_X0_U0_X1(dataset, settings):
     # Use .iloc for pandas DataFrame
-    X0 = dataset[:-1, [2, 3]]  # don't need second column Tc - only one control input needed
-    U0 = dataset[:-1, [0]]
-    X1 = dataset[1:, [2, 3]]  # start from 1 
+    X0 = dataset[:-1, [0,1]]  # don't need second column Tc - only one control input needed
+    U0 = dataset[:-1, [2,3]]
+    X1 = dataset[1:, [0,1]]  # start from 1 
     return X0, U0, X1
 
 
