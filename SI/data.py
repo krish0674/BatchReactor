@@ -28,6 +28,7 @@ class ElementwiseScaler():
 
 def get_train_val_dataloaders(settings):
     dataset = load_raw_data(settings, train_or_test='train')
+    dataset=dataset[['Tr','Tj','H','Fc']]
     dataset = scale_data(dataset, settings)
     train_dataset, val_dataset = train_val_split(dataset, settings)
     
